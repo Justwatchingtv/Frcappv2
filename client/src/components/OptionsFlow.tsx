@@ -87,7 +87,7 @@ export function OptionsFlow() {
             {filteredFlow?.map((item: any) => (
               <TableRow key={item.id}>
                 <TableCell>
-                  {format(new Date(item.timestamp), 'HH:mm:ss')}
+                  {item.timestamp ? format(new Date(parseInt(item.timestamp)), 'HH:mm:ss') : 'N/A'}
                 </TableCell>
                 <TableCell className="font-medium">{item.ticker}</TableCell>
                 <TableCell>
