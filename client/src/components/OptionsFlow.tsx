@@ -88,22 +88,22 @@ export function OptionsFlow() {
             {filteredFlow?.map((item: any) => (
               <TableRow key={item.id}>
                 <TableCell>
-                  {item.timestamp ? format(new Date(parseInt(item.timestamp)), 'HH:mm:ss') : 'N/A'}
+                  {format(new Date(item.timestamp), 'HH:mm:ss')}
                 </TableCell>
                 <TableCell>
-                  <Link href={`/ticker/${item.ticker}`} className="text-primary hover:underline"> {/* Corrected to use item.ticker and TableCell */}
+                  <Link href={`/ticker/${item.ticker}`} className="text-primary hover:underline">
                     {item.ticker}
                   </Link>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={item.type === 'call' ? 'default' : 'destructive'}>
-                    {item.type.toUpperCase()}
+                  <Badge variant={item.contract_type === 'call' ? 'default' : 'destructive'}>
+                    {item.contract_type.toUpperCase()}
                   </Badge>
                 </TableCell>
-                <TableCell>${item.strike}</TableCell>
-                <TableCell>{format(new Date(item.expiry), 'MM/dd/yyyy')}</TableCell>
-                <TableCell>{item.volume.toLocaleString()}</TableCell>
-                <TableCell>${(item.premium / 100).toLocaleString()}</TableCell>
+                <TableCell>${item.strike_price}</TableCell>
+                <TableCell>{format(new Date(item.expiration_date), 'MM/dd/yyyy')}</TableCell>
+                <TableCell>{item.size.toLocaleString()}</TableCell>
+                <TableCell>${(item.premium).toLocaleString()}</TableCell>
               </TableRow>
             ))}
           </TableBody>
