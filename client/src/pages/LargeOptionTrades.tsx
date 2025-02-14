@@ -74,7 +74,7 @@ export default function LargeOptionTrades() {
                       {flow?.map((item) => (
                         <TableRow key={item.id}>
                           <TableCell>
-                            {format(new Date(parseInt(item.timestamp)), "HH:mm:ss")}
+                            {item.timestamp ? format(new Date(item.timestamp), "HH:mm:ss") : "-"}
                           </TableCell>
                           <TableCell>{item.ticker}</TableCell>
                           <TableCell>
