@@ -1,55 +1,53 @@
+
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useForm } from "react-hook-form";
-import { ArrowLeft, AlertCircle, TrendingUp, TrendingDown } from "lucide-react";
+import { ArrowLeft, TrendingUp, TrendingDown } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { PaperTradingLeaderboard } from "@/components/PaperTradingLeaderboard";
+import { StockChart } from "@/components/StockChart";
+import { Toggle } from "@/components/ui/toggle";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface TradeForm {
   symbol: string;
-  amount: number;
-  type: 'call' | 'put';
-  expiry: string;
-  strike: number;
-}
-
-interface Position {
-  id: number;
-  symbol: string;
-  optionType: 'call' | 'put';
+  side: 'buy' | 'sell';
   quantity: number;
-  entryPrice: number;
-  strikePrice: number;
-  expiryDate: string;
-  status: 'open' | 'closed';
-  pnl: number;
-  riskLevel: string;
-}
-
-interface Account {
-  balance: number;
-  totalPnl: number;
-  dailyPnl: number;
+  orderType: 'MARKET' | 'LIMIT';
+  limitPrice?: number;
+  timeInForce: 'DAY' | 'GTC';
+  extendedHours: boolean;
 }
 
 export default function PaperTrading() {
   const { toast } = useToast();
-  const [position, setPosition] = useState<Position | null>(null);
-  const [riskAssessment, setRiskAssessment] = useState<string | null>(null);
+  const [selectedSymbol, setSelectedSymbol] = useState<string>("");
+  const [orderType, setOrderType] = useState<'MARKET' | 'LIMIT'>('MARKET');
 
-  const { data: account, isLoading: isLoadingAccount } = useQuery<Account>({
+  const { data: account, isLoading: isLoadingAccount } = useQuery({
     queryKey: ["/api/paper-trading/account"],
   });
 
-  const { data: positions, isLoading: isLoadingPositions } = useQuery<Position[]>({
+  const { data: positions = [], isLoading: isLoadingPositions } = useQuery({
     queryKey: ["/api/paper-trading/positions"],
+  });
+
+  const form = useForm<TradeForm>({
+    defaultValues: {
+      symbol: "",
+      side: 'buy',
+      quantity: 0,
+      orderType: 'MARKET',
+      timeInForce: 'DAY',
+      extendedHours: false,
+    },
   });
 
   const tradeMutation = useMutation({
@@ -59,11 +57,7 @@ export default function PaperTrading() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-
-      if (!response.ok) {
-        throw new Error(await response.text());
-      }
-
+      if (!response.ok) throw new Error(await response.text());
       return response.json();
     },
     onSuccess: () => {
@@ -81,34 +75,9 @@ export default function PaperTrading() {
     },
   });
 
-  const form = useForm<TradeForm>({
-    defaultValues: {
-      symbol: "",
-      amount: 1000,
-      type: 'call',
-      expiry: "",
-      strike: 0,
-    },
-  });
-
-  const onSubmit = async (data: TradeForm) => {
-    // Calculate max loss
-    const maxLoss = data.type === 'call' ? data.amount : data.strike * 100;
-
-    // Risk assessment
-    const riskLevel = maxLoss > 5000 ? 'HIGH' : maxLoss > 2000 ? 'MEDIUM' : 'LOW';
-    setRiskAssessment(`Risk Level: ${riskLevel} - Max Loss: $${maxLoss.toLocaleString()}`);
-
-    try {
-      await tradeMutation.mutateAsync(data);
-    } catch (error) {
-      console.error('Trade error:', error);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background p-8">
-      <div className="container mx-auto max-w-6xl">
+      <div className="container mx-auto max-w-7xl">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/">
@@ -116,60 +85,50 @@ export default function PaperTrading() {
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
-            <h1 className="text-2xl font-bold">Paper Trading Simulator</h1>
+            <h1 className="text-2xl font-bold">Paper Trading</h1>
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
-          <div className="md:col-span-2 space-y-6">
-            {/* Account Details */}
-            <Card className="p-4">
+        <div className="grid gap-6 md:grid-cols-12">
+          {/* Main Trading Area - 8 columns */}
+          <div className="md:col-span-8 space-y-6">
+            {/* Account Overview */}
+            <Card>
               <CardHeader>
-                <CardTitle>Paper Account Details</CardTitle>
+                <CardTitle>Account Overview</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Net Account Value(USD)</span>
-                    <span className="text-sm">${account?.balance.toLocaleString()}</span>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <div>
+                    <div className="text-sm text-muted-foreground">Net Account Value</div>
+                    <div className="text-2xl font-bold">${account?.balance.toLocaleString()}</div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Overall P&L</span>
-                    <span className={`text-sm ${account?.totalPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                      {account?.totalPnl >= 0 ? '+' : ''}{((account?.totalPnl || 0) / 100000 * 100).toFixed(2)}%
-                    </span>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Overall P&L</div>
+                    <div className={`text-xl font-bold ${account?.totalPnl >= 0 ? 'text-[#00C805]' : 'text-[#FF333A]'}`}>
+                      {account?.totalPnl >= 0 ? '+' : ''}{((account?.totalPnl || 0) / account?.balance * 100).toFixed(2)}%
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Market Value</span>
-                    <span className="text-sm">$0.00</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Buying Power</span>
-                    <span className="text-sm">${account?.balance.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Day's P&L</span>
-                    <span className={`text-sm ${account?.dailyPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                      ${(account?.dailyPnl || 0).toLocaleString()}
-                    </span>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Buying Power</div>
+                    <div className="text-2xl font-bold">${account?.balance.toLocaleString()}</div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Trade Form and Positions */}
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Trade Form */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>New Trade</CardTitle>
-                  <CardDescription>
-                    Open a new paper trading position
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Chart */}
+            <StockChart />
+
+            {/* Order Entry */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Place Order</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit((data) => tradeMutation.mutate(data))} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
                         name="symbol"
@@ -182,137 +141,160 @@ export default function PaperTrading() {
                           </FormItem>
                         )}
                       />
-
                       <FormField
                         control={form.control}
-                        name="amount"
+                        name="side"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Amount ($)</FormLabel>
-                            <FormControl>
-                              <Input type="number" {...field} />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="type"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Option Type</FormLabel>
+                            <FormLabel>Side</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger>
-                                  <SelectValue placeholder="Select option type" />
+                                  <SelectValue placeholder="Select side" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="call">Call</SelectItem>
-                                <SelectItem value="put">Put</SelectItem>
+                                <SelectItem value="buy">Buy</SelectItem>
+                                <SelectItem value="sell">Sell</SelectItem>
                               </SelectContent>
                             </Select>
                           </FormItem>
                         )}
                       />
-
                       <FormField
                         control={form.control}
-                        name="expiry"
+                        name="orderType"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Expiry Date</FormLabel>
-                            <FormControl>
-                              <Input type="date" {...field} />
-                            </FormControl>
+                            <FormLabel>Order Type</FormLabel>
+                            <Select onValueChange={(value) => {
+                              field.onChange(value);
+                              setOrderType(value as 'MARKET' | 'LIMIT');
+                            }} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select order type" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="MARKET">Market</SelectItem>
+                                <SelectItem value="LIMIT">Limit</SelectItem>
+                              </SelectContent>
+                            </Select>
                           </FormItem>
                         )}
                       />
-
                       <FormField
                         control={form.control}
-                        name="strike"
+                        name="quantity"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Strike Price</FormLabel>
+                            <FormLabel>Quantity</FormLabel>
                             <FormControl>
                               <Input type="number" {...field} />
                             </FormControl>
                           </FormItem>
                         )}
                       />
-
-                      <Button type="submit" className="w-full">
-                        {tradeMutation.isPending ? (
-                          <div className="flex items-center gap-2">
-                            <span className="animate-spin">↻</span>
-                            Processing...
-                          </div>
-                        ) : (
-                          "Place Trade"
-                        )}
-                      </Button>
-                    </form>
-                  </Form>
-                </CardContent>
-              </Card>
-
-              {/* Open Positions */}
-              <div className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Open Positions</CardTitle>
-                    <CardDescription>
-                      Your active paper trading positions
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {positions?.map((pos) => (
-                        <div
-                          key={pos.id}
-                          className="flex items-center justify-between p-4 rounded-lg border"
-                        >
-                          <div>
-                            <div className="font-medium">{pos.symbol}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {pos.optionType.toUpperCase()} ${pos.strikePrice} {new Date(pos.expiryDate).toLocaleDateString()}
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className={`font-medium ${pos.pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                              {pos.pnl >= 0 ? <TrendingUp className="inline h-4 w-4 mr-1" /> : <TrendingDown className="inline h-4 w-4 mr-1" />}
-                              ${Math.abs(pos.pnl).toLocaleString()}
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              Risk: {pos.riskLevel}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-
-                      {positions?.length === 0 && (
-                        <div className="text-center text-muted-foreground py-8">
-                          No open positions
-                        </div>
+                      {orderType === 'LIMIT' && (
+                        <FormField
+                          control={form.control}
+                          name="limitPrice"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Limit Price</FormLabel>
+                              <FormControl>
+                                <Input type="number" step="0.01" {...field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
                       )}
+                      <FormField
+                        control={form.control}
+                        name="timeInForce"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Time in Force</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select TIF" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="DAY">Day</SelectItem>
+                                <SelectItem value="GTC">GTC</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="extendedHours"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Extended Hours</FormLabel>
+                            <FormControl>
+                              <Toggle 
+                                pressed={field.value}
+                                onPressedChange={field.onChange}
+                                className="w-full"
+                              >
+                                {field.value ? 'Yes' : 'No'}
+                              </Toggle>
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
                     </div>
-                  </CardContent>
-                </Card>
+                    <Button type="submit" className="w-full">
+                      {tradeMutation.isPending ? "Placing Order..." : "Place Order"}
+                    </Button>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
 
-                {riskAssessment && (
-                  <Alert>
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{riskAssessment}</AlertDescription>
-                  </Alert>
-                )}
-              </div>
-            </div>
+            {/* Positions */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Positions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {positions.map((position) => (
+                    <div
+                      key={position.id}
+                      className="flex items-center justify-between p-4 rounded-lg border"
+                    >
+                      <div>
+                        <div className="font-medium">{position.symbol}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {position.quantity} shares @ ${position.entryPrice}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className={`font-medium ${position.pnl >= 0 ? 'text-[#00C805]' : 'text-[#FF333A]'}`}>
+                          {position.pnl >= 0 ? <TrendingUp className="inline h-4 w-4 mr-1" /> : <TrendingDown className="inline h-4 w-4 mr-1" />}
+                          ${Math.abs(position.pnl).toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {positions.length === 0 && (
+                    <div className="text-center text-muted-foreground py-8">
+                      No open positions
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Leaderboard */}
-          <div className="md:col-span-1">
+          {/* Sidebar - 4 columns */}
+          <div className="md:col-span-4 space-y-6">
             <PaperTradingLeaderboard />
           </div>
         </div>
