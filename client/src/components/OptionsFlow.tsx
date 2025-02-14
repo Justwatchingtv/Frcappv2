@@ -51,7 +51,9 @@ export function OptionsFlow() {
           <TableBody>
             {flow?.map((item: any) => (
               <TableRow key={item.id}>
-                <TableCell>{format(new Date(item.timestamp), 'HH:mm:ss')}</TableCell>
+                <TableCell>
+                  {item.timestamp ? format(new Date(parseInt(item.timestamp)), 'HH:mm:ss') : '-'}
+                </TableCell>
                 <TableCell className="font-medium">{item.ticker}</TableCell>
                 <TableCell>
                   <Badge variant={item.type === 'call' ? 'default' : 'destructive'}>
