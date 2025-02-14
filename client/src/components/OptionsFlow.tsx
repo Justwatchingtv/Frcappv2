@@ -1,4 +1,8 @@
+
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { Loader2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -9,14 +13,34 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
-import { Loader2 } from "lucide-react";
+import { OptionsFlowFilters, Filters } from "./OptionsFlowFilters";
 
 export function OptionsFlow() {
+  const [filters, setFilters] = useState<Filters>({
+    unusual: false,
+    scalp: false,
+    golden: false,
+  });
+
   const { data: flow, isLoading } = useQuery({
     queryKey: ["/api/options-flow"],
-    refetchInterval: 5000, // Refetch every 5 seconds
-    staleTime: 1000, // Consider data stale after 1 second
+    refetchInterval: 5000,
+    staleTime: 1000,
+  });
+
+  const filteredFlow = flow?.filter((item: any) => {
+    if (!filters.unusual && !filters.scalp && !filters.golden) {
+      return true;
+    }
+
+    const volume = item.volume;
+    const premium = item.premium / 100; // Convert to dollars
+
+    return (
+      (filters.unusual && volume > 1000) ||
+      (filters.scalp && premium <= 0.05) ||
+      (filters.golden && volume > 1000 && premium > 0.10)
+    );
   });
 
   if (isLoading) {
@@ -33,9 +57,10 @@ export function OptionsFlow() {
   }
 
   return (
-    <Card>
+    <Card className="bg-gray-900">
       <CardHeader>
         <CardTitle>Options Flow</CardTitle>
+        <OptionsFlowFilters filters={filters} onFilterChange={setFilters} />
       </CardHeader>
       <CardContent>
         <Table>
@@ -51,11 +76,9 @@ export function OptionsFlow() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {flow?.map((item: any) => (
+            {filteredFlow?.map((item: any) => (
               <TableRow key={item.id}>
-                <TableCell>
-                  {item.timestamp ? format(new Date(parseInt(item.timestamp)), 'HH:mm:ss') : '-'}
-                </TableCell>
+                <TableCell>{format(new Date(item.timestamp), 'HH:mm:ss')}</TableCell>
                 <TableCell className="font-medium">{item.ticker}</TableCell>
                 <TableCell>
                   <Badge variant={item.type === 'call' ? 'default' : 'destructive'}>
