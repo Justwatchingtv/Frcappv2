@@ -251,7 +251,7 @@ export function SocialFeed() {
             </TabsList>
 
             <TabsContent value="all" className="h-full">
-              <ScrollArea className="h-[calc(80vh-8rem)]">
+              <ScrollArea className="h-[calc(80vh-12rem)]">
                 <div className="space-y-4 p-4">
                   {posts?.map((post: any) => (
                     <motion.div
