@@ -63,7 +63,11 @@ export default function AuthPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
+              <Button 
+                type="submit" 
+                className={`w-full ${!isLogin ? "bg-primary hover:bg-primary/90 text-lg font-semibold" : ""}`}
+                size={!isLogin ? "lg" : "default"}
+              >
                 {isLogin ? "Login" : "Register"}
               </Button>
             </form>
