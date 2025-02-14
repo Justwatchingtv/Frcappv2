@@ -247,20 +247,66 @@ export default function LargeOptionTrades() {
               </CardContent>
             </Card>
           </TabsContent>
-          {["frc", "premium"].map((tab) => (
-            <TabsContent key={tab} value={tab}>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="capitalize">{tab}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-center py-8 text-muted-foreground">
-                    Coming soon...
+          <TabsContent value="frc">
+            <Card>
+              <CardHeader>
+                <CardTitle>FRC AI Sweeps</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-center py-8 text-muted-foreground">
+                  Coming soon...
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="premium">
+            <Card>
+              <CardHeader>
+                <CardTitle>Premium ($100K+)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="flex justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin" />
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          ))}
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Time</TableHead>
+                        <TableHead>Symbol</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Strike</TableHead>
+                        <TableHead>Expiry</TableHead>
+                        <TableHead>Size</TableHead>
+                        <TableHead>Premium</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {flow?.filter(item => item.premium >= 100000).map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell>
+                            {item.timestamp ? format(new Date(item.timestamp), "HH:mm:ss") : "-"}
+                          </TableCell>
+                          <TableCell>{item.ticker}</TableCell>
+                          <TableCell>
+                            <Badge variant={item.type === "call" ? "default" : "destructive"}>
+                              {item.type.toUpperCase()}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>${item.strike}</TableCell>
+                          <TableCell>{format(new Date(item.expiry), "MM/dd/yyyy")}</TableCell>
+                          <TableCell>{item.volume.toLocaleString()}</TableCell>
+                          <TableCell>${item.premium.toLocaleString()}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
     </div>
