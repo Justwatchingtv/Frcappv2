@@ -324,6 +324,78 @@ export function registerRoutes(app: Express): Server {
         return res.status(404).send("Trading account not found");
       }
 
+      const { symbol, quantity, price, type, side } = req.body;
+      
+      // Calculate trade value
+      const tradeValue = quantity * (price || 0); // For market orders, price will be determined at execution
+
+      // Check if user has enough balance for buy orders
+      if (side === 'buy' && account.balance < tradeValue) {
+        return res.status(400).send("Insufficient funds");
+      }
+
+      // Create new position or update existing
+      const [existingPosition] = await db
+        .select()
+        .from(paperTradingPositions)
+        .where(eq(paperTradingPositions.accountId, account.id))
+        .where(eq(paperTradingPositions.symbol, symbol))
+        .where(eq(paperTradingPositions.status, 'open'))
+        .limit(1);
+
+      if (existingPosition && side === 'buy') {
+        // Update existing long position
+        await db
+          .update(paperTradingPositions)
+          .set({
+            quantity: existingPosition.quantity + quantity,
+            entryPrice: (existingPosition.entryPrice + price) / 2,
+          })
+          .where(eq(paperTradingPositions.id, existingPosition.id));
+      } else {
+        // Create new position
+        await db
+          .insert(paperTradingPositions)
+          .values({
+            accountId: account.id,
+            symbol,
+            quantity: side === 'buy' ? quantity : -quantity,
+            entryPrice: price,
+            status: 'open',
+          });
+      }
+
+      // Update account balance
+      await db
+        .update(paperTradingAccounts)
+        .set({
+          balance: side === 'buy' 
+            ? account.balance - tradeValue
+            : account.balance + tradeValue,
+        })
+        .where(eq(paperTradingAccounts.id, account.id));
+
+      res.json({ message: "Trade executed successfully" });
+    } catch (error) {
+      console.error("Trade error:", error);
+      res.status(500).send("Error executing trade");
+    }
+  });
+    if (!req.user) {
+      return res.status(401).send("Not authenticated");
+    }
+
+    try {
+      const [account] = await db
+        .select()
+        .from(paperTradingAccounts)
+        .where(eq(paperTradingAccounts.userId, req.user.id))
+        .limit(1);
+
+      if (!account) {
+        return res.status(404).send("Trading account not found");
+      }
+
       const { symbol, amount, type, expiry, strike } = req.body;
 
       // Check if user has enough balance
