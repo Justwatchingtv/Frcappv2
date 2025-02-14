@@ -98,14 +98,14 @@ export function registerRoutes(app: Express): Server {
   // Get options flow data
   app.get("/api/options-flow", async (req, res) => {
     try {
-      const optionsFlow = await db.select()
-        .from(optionsFlow)
-        .orderBy(desc(optionsFlow.timestamp))
-        .limit(100);
-      res.json(optionsFlow);
+      const flow = await db.query.optionsFlow.findMany({
+        orderBy: desc(optionsFlow.createdAt),
+        limit: 100,
+        where: (optionsFlow, { gt }) => gt(optionsFlow.createdAt, new Date(Date.now() - 24 * 60 * 60 * 1000)) // Last 24 hours
+      });
+      res.json(flow);
     } catch (error) {
-      console.error('Error fetching options flow:', error);
-      res.status(500).json({ error: 'Failed to fetch options flow' });
+      res.status(500).send("Error fetching options flow");
     }
   });
 
@@ -628,50 +628,6 @@ export function registerRoutes(app: Express): Server {
       res.status(500).send("Error updating avatar");
     }
   });
-
-  app.post("/api/posts/:postId/reactions", async (req, res) => {
-    try {
-      const { postId } = req.params;
-      const { type } = req.body;
-
-      // Remove existing reaction of same type if exists
-      await db.delete(reactions)
-        .where(and(
-          eq(reactions.postId, postId),
-          eq(reactions.userId, req.user!.id),
-          eq(reactions.type, type)
-        ));
-
-      // Add new reaction
-      const reaction = await db.insert(reactions).values({
-        postId,
-        userId: req.user!.id,
-        type,
-      });
-
-      res.json(reaction);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to add reaction" });
-    }
-  });
-
-  app.post("/api/posts/:postId/comments", async (req, res) => {
-    try {
-      const { postId } = req.params;
-      const { content } = req.body;
-
-      const comment = await db.insert(comments).values({
-        postId,
-        userId: req.user!.id,
-        content,
-      });
-
-      res.json(comment);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to add comment" });
-    }
-  });
-
 
   const httpServer = createServer(app);
   return httpServer;

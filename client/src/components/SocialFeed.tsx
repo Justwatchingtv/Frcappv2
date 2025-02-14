@@ -58,38 +58,6 @@ export function SocialFeed() {
     },
   });
 
-  const addReaction = useMutation({
-    mutationFn: async ({ postId, type }: { postId: string; type: string }) => {
-      const response = await fetch(`/api/posts/${postId}/reactions`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ type }),
-      });
-      if (!response.ok) throw new Error("Failed to add reaction");
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
-    },
-  });
-
-  const addComment = useMutation({
-    mutationFn: async ({ postId, content }: { postId: string; content: string }) => {
-      const response = await fetch(`/api/posts/${postId}/comments`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ content }),
-      });
-      if (!response.ok) throw new Error("Failed to add comment");
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
-    },
-  });
-
   if (isLoading) {
     return (
       <Card>
@@ -150,56 +118,6 @@ export function SocialFeed() {
                   )}
                 </div>
                 <p className="text-sm">{post.content}</p>
-                <div className="flex items-center gap-2 pt-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => addReaction.mutate({ postId: post.id, type: 'like' })}
-                  >
-                    <ThumbsUp className={`h-4 w-4 mr-1 ${post.reactions?.some(r => r.type === 'like' && r.userId === user?.id) ? 'fill-primary' : ''}`} />
-                    {post.reactions?.filter(r => r.type === 'like').length || 0}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => addReaction.mutate({ postId: post.id, type: 'bullish' })}
-                  >
-                    <TrendingUp className={`h-4 w-4 mr-1 ${post.reactions?.some(r => r.type === 'bullish' && r.userId === user?.id) ? 'fill-green-500' : ''}`} />
-                    {post.reactions?.filter(r => r.type === 'bullish').length || 0}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => addReaction.mutate({ postId: post.id, type: 'bearish' })}
-                  >
-                    <TrendingDown className={`h-4 w-4 mr-1 ${post.reactions?.some(r => r.type === 'bearish' && r.userId === user?.id) ? 'fill-red-500' : ''}`} />
-                    {post.reactions?.filter(r => r.type === 'bearish').length || 0}
-                  </Button>
-                </div>
-                {post.comments && post.comments.length > 0 && (
-                  <div className="mt-4 space-y-2">
-                    {post.comments.map((comment: any) => (
-                      <div key={comment.id} className="bg-muted rounded p-2">
-                        <p className="text-sm font-medium">{comment.user.username}</p>
-                        <p className="text-sm">{comment.content}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <div className="flex items-center gap-2 mt-2">
-                  <Input
-                    placeholder="Add a comment..."
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        const content = (e.target as HTMLInputElement).value;
-                        if (content.trim()) {
-                          addComment.mutate({ postId: post.id, content });
-                          (e.target as HTMLInputElement).value = '';
-                        }
-                      }
-                    }}
-                  />
-                </div>
               </div>
             ))}
           </div>
@@ -212,11 +130,7 @@ export function SocialFeed() {
             <DialogTitle>Social Board</DialogTitle>
           </DialogHeader>
           <Tabs defaultValue="following" className="h-full">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="all">
-                <MessageSquare className="h-4 w-4 mr-2" />
-                All Posts
-              </TabsTrigger>
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="following">
                 <Users className="h-4 w-4 mr-2" />
                 Following
@@ -234,46 +148,6 @@ export function SocialFeed() {
                 For You
               </TabsTrigger>
             </TabsList>
-
-            <TabsContent value="all" className="h-full">
-              <ScrollArea className="h-[calc(80vh-8rem)]">
-                <div className="space-y-4 p-4">
-                  {posts?.map((post: any) => (
-                    <motion.div
-                      key={post.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="border border-border rounded-lg p-4 space-y-2"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium">{post.user.username}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {format(new Date(post.createdAt), "PPp")}
-                          </p>
-                        </div>
-                        {post.ticker && (
-                          <span className="text-sm font-medium text-primary">
-                            ${post.ticker}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm">{post.content}</p>
-                      <div className="flex items-center gap-2 pt-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => addReaction.mutate({ postId: post.id, type: 'like' })}
-                        >
-                          <ThumbsUp className={`h-4 w-4 mr-1 ${post.reactions?.some(r => r.type === 'like' && r.userId === user?.id) ? 'fill-primary' : ''}`} />
-                          {post.reactions?.filter(r => r.type === 'like').length || 0}
-                        </Button>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </TabsContent>
 
             <TabsContent value="following" className="h-full">
               <ScrollArea className="h-[calc(80vh-8rem)]">

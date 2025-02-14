@@ -1,6 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
-import { Loader2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -11,12 +9,14 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { format } from "date-fns";
+import { Loader2 } from "lucide-react";
 
 export function OptionsFlow() {
   const { data: flow, isLoading } = useQuery({
     queryKey: ["/api/options-flow"],
-    refetchInterval: 5000,
+    refetchInterval: 5000, // Refetch every 5 seconds
+    staleTime: 1000, // Consider data stale after 1 second
   });
 
   if (isLoading) {
@@ -33,17 +33,9 @@ export function OptionsFlow() {
   }
 
   return (
-    <Card className="bg-gray-900">
+    <Card>
       <CardHeader>
         <CardTitle>Options Flow</CardTitle>
-        <Tabs defaultValue="flow" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="flow">Flow Feed</TabsTrigger>
-            <TabsTrigger value="scalps">Scalps</TabsTrigger>
-            <TabsTrigger value="unusual">Unusual</TabsTrigger>
-            <TabsTrigger value="golden">Golden Sweeps</TabsTrigger>
-          </TabsList>
-        </Tabs>
       </CardHeader>
       <CardContent>
         <Table>
@@ -61,17 +53,19 @@ export function OptionsFlow() {
           <TableBody>
             {flow?.map((item: any) => (
               <TableRow key={item.id}>
-                <TableCell>{item.time || 'N/A'}</TableCell>
-                <TableCell>{item.ticker}</TableCell>
                 <TableCell>
-                  <Badge variant={item.type === 'CALL' ? 'default' : 'destructive'}>
-                    {item.type}
+                  {item.timestamp ? format(new Date(parseInt(item.timestamp)), 'HH:mm:ss') : '-'}
+                </TableCell>
+                <TableCell className="font-medium">{item.ticker}</TableCell>
+                <TableCell>
+                  <Badge variant={item.type === 'call' ? 'default' : 'destructive'}>
+                    {item.type.toUpperCase()}
                   </Badge>
                 </TableCell>
                 <TableCell>${item.strike}</TableCell>
                 <TableCell>{format(new Date(item.expiry), 'MM/dd/yyyy')}</TableCell>
                 <TableCell>{item.volume.toLocaleString()}</TableCell>
-                <TableCell>${item.premium.toLocaleString()}</TableCell>
+                <TableCell>${(item.premium / 100).toLocaleString()}</TableCell>
               </TableRow>
             ))}
           </TableBody>
