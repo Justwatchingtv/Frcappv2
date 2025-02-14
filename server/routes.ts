@@ -325,7 +325,7 @@ export function registerRoutes(app: Express): Server {
       }
 
       const { symbol, quantity, price, type, side } = req.body;
-      
+
       // Calculate trade value
       const tradeValue = quantity * (price || 0); // For market orders, price will be determined at execution
 
