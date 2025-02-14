@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -75,7 +74,7 @@ export default function LargeOptionTrades() {
                       {flow?.map((item) => (
                         <TableRow key={item.id}>
                           <TableCell>
-                            {format(new Date(item.timestamp), "HH:mm:ss")}
+                            {format(new Date(parseInt(item.timestamp)), "HH:mm:ss")}
                           </TableCell>
                           <TableCell>{item.ticker}</TableCell>
                           <TableCell>
