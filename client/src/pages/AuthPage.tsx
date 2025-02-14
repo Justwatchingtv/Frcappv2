@@ -63,18 +63,14 @@ export default function AuthPage() {
                   </FormItem>
                 )}
               />
-              <Button 
-                type="submit" 
-                className={`w-full ${!isLogin ? "bg-primary hover:bg-primary/90 text-lg font-semibold" : ""}`}
-                size={!isLogin ? "lg" : "default"}
-              >
+              <Button type="submit" className="w-full">
                 {isLogin ? "Login" : "Register"}
               </Button>
             </form>
           </Form>
           <Button
-            variant="ghost"
-            className="mt-4 w-full hover:bg-primary/10 text-primary"
+            variant="link"
+            className="mt-4 w-full"
             onClick={() => setIsLogin(!isLogin)}
           >
             {isLogin ? "Need an account? Register" : "Have an account? Login"}
