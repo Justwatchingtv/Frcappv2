@@ -212,18 +212,22 @@ export function SocialFeed() {
             <DialogTitle>Social Board</DialogTitle>
           </DialogHeader>
           <Tabs defaultValue="following" className="h-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="following">
                 <Users className="h-4 w-4 mr-2" />
                 Following
+              </TabsTrigger>
+              <TabsTrigger value="watchlist">
+                <List className="h-4 w-4 mr-2" />
+                Watchlist
               </TabsTrigger>
               <TabsTrigger value="trending">
                 <TrendingUp className="h-4 w-4 mr-2" />
                 Trending
               </TabsTrigger>
-              <TabsTrigger value="all">
-                <List className="h-4 w-4 mr-2" />
-                All Posts
+              <TabsTrigger value="suggested">
+                <Sparkles className="h-4 w-4 mr-2" />
+                For You
               </TabsTrigger>
             </TabsList>
 
@@ -257,72 +261,32 @@ export function SocialFeed() {
               </ScrollArea>
             </TabsContent>
 
-            <TabsContent value="trending" className="h-full">
+            <TabsContent value="watchlist" className="h-full">
               <ScrollArea className="h-[calc(80vh-8rem)]">
                 <div className="space-y-4 p-4">
-                  {posts?.filter((post: any) => post.trending).map((post: any) => (
-                    <motion.div
-                      key={post.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="border border-border rounded-lg p-4 space-y-2"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium">{post.user.username}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {format(new Date(post.createdAt), "PPp")}
-                          </p>
-                        </div>
-                        {post.ticker && (
-                          <span className="text-sm font-medium text-primary">
-                            ${post.ticker}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm">{post.content}</p>
-                    </motion.div>
-                  ))}
+                  <div className="text-center text-muted-foreground">
+                    Posts from your paper trading watchlist will appear here
+                  </div>
                 </div>
               </ScrollArea>
             </TabsContent>
 
-            <TabsContent value="all" className="h-full">
+            <TabsContent value="trending" className="h-full">
               <ScrollArea className="h-[calc(80vh-8rem)]">
                 <div className="space-y-4 p-4">
-                  {posts?.map((post: any) => (
-                    <motion.div
-                      key={post.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="border border-border rounded-lg p-4 space-y-2"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium">{post.user.username}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {format(new Date(post.createdAt), "PPp")}
-                          </p>
-                        </div>
-                        {post.ticker && (
-                          <span className="text-sm font-medium text-primary">
-                            ${post.ticker}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm">{post.content}</p>
-                      <div className="flex items-center gap-2 pt-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => addReaction.mutate({ postId: post.id, type: 'like' })}
-                        >
-                          <ThumbsUp className={`h-4 w-4 mr-1 ${post.reactions?.some(r => r.type === 'like' && r.userId === user?.id) ? 'text-primary' : ''}`} />
-                          {post.reactions?.filter(r => r.type === 'like').length || 0}
-                        </Button>
-                      </div>
-                    </motion.div>
-                  ))}
+                  <div className="text-center text-muted-foreground">
+                    Posts about trending stocks will appear here
+                  </div>
+                </div>
+              </ScrollArea>
+            </TabsContent>
+
+            <TabsContent value="suggested" className="h-full">
+              <ScrollArea className="h-[calc(80vh-8rem)]">
+                <div className="space-y-4 p-4">
+                  <div className="text-center text-muted-foreground">
+                    Personalized post suggestions based on your activity will appear here
+                  </div>
                 </div>
               </ScrollArea>
             </TabsContent>
