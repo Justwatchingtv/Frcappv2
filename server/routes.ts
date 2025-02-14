@@ -98,10 +98,13 @@ export function registerRoutes(app: Express): Server {
   // Get options flow data
   app.get("/api/options-flow", async (req, res) => {
     try {
-      const optionsFlow = await db.select()
-        .from(optionsFlow)
-        .orderBy(desc(optionsFlow.timestamp))
-        .limit(100);
+      const optionsFlow = await db.query.optionsFlow.findMany({
+        orderBy: (flow, { desc }) => [desc(flow.timestamp)],
+        where: (flow, { and, gte }) => and(
+          gte(flow.timestamp, new Date(Date.now() - 24 * 60 * 60 * 1000))
+        ),
+        limit: 100
+      });
       res.json(optionsFlow);
     } catch (error) {
       console.error('Error fetching options flow:', error);

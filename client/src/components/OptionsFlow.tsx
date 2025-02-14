@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -13,8 +14,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from 'wouter'; // Added import for Link component
-
 
 export function OptionsFlow() {
   const [selectedTab, setSelectedTab] = useState("flow");
@@ -26,7 +25,7 @@ export function OptionsFlow() {
 
   const filterFlowByTab = (flow: any[], tab: string) => {
     if (!flow) return [];
-
+    
     switch (tab) {
       case 'scalps':
         return flow.filter(item => item.premium <= 5); // $5 or less
@@ -88,22 +87,18 @@ export function OptionsFlow() {
             {filteredFlow?.map((item: any) => (
               <TableRow key={item.id}>
                 <TableCell>
-                  {format(new Date(item.timestamp), 'HH:mm:ss')}
+                  {item.timestamp ? format(new Date(parseInt(item.timestamp)), 'HH:mm:ss') : 'N/A'}
                 </TableCell>
+                <TableCell className="font-medium">{item.ticker}</TableCell>
                 <TableCell>
-                  <Link href={`/ticker/${item.ticker}`} className="text-primary hover:underline">
-                    {item.ticker}
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={item.contract_type === 'call' ? 'default' : 'destructive'}>
-                    {item.contract_type.toUpperCase()}
+                  <Badge variant={item.type === 'call' ? 'default' : 'destructive'}>
+                    {item.type.toUpperCase()}
                   </Badge>
                 </TableCell>
-                <TableCell>${item.strike_price}</TableCell>
-                <TableCell>{format(new Date(item.expiration_date), 'MM/dd/yyyy')}</TableCell>
-                <TableCell>{item.size.toLocaleString()}</TableCell>
-                <TableCell>${(item.premium).toLocaleString()}</TableCell>
+                <TableCell>${item.strike}</TableCell>
+                <TableCell>{format(new Date(item.expiry), 'MM/dd/yyyy')}</TableCell>
+                <TableCell>{item.volume.toLocaleString()}</TableCell>
+                <TableCell>${(item.premium / 100).toLocaleString()}</TableCell>
               </TableRow>
             ))}
           </TableBody>
