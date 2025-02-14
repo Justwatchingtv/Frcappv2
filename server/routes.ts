@@ -101,7 +101,6 @@ export function registerRoutes(app: Express): Server {
       const flow = await db.query.optionsFlow.findMany({
         orderBy: desc(optionsFlow.createdAt),
         limit: 100,
-        where: (optionsFlow, { gt }) => gt(optionsFlow.createdAt, new Date(Date.now() - 24 * 60 * 60 * 1000)) // Last 24 hours
       });
       res.json(flow);
     } catch (error) {

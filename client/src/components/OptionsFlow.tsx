@@ -15,8 +15,6 @@ import { Loader2 } from "lucide-react";
 export function OptionsFlow() {
   const { data: flow, isLoading } = useQuery({
     queryKey: ["/api/options-flow"],
-    refetchInterval: 5000, // Refetch every 5 seconds
-    staleTime: 1000, // Consider data stale after 1 second
   });
 
   if (isLoading) {
