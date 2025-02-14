@@ -118,34 +118,6 @@ export default function PaperTrading() {
             </Link>
             <h1 className="text-2xl font-bold">Paper Trading Simulator</h1>
           </div>
-          <Card className="p-4">
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">Net Account Value(USD)</span>
-                <span className="text-sm">${account?.balance.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">Overall P&L</span>
-                <span className={`text-sm ${account?.totalPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  ${account?.totalPnl.toLocaleString()} {account?.totalPnl >= 0 ? '+' : ''}{((account?.totalPnl || 0) / 100000 * 100).toFixed(2)}%
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">Market Value</span>
-                <span className="text-sm">${(account?.marketValue || 0).toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">Buying Power</span>
-                <span className="text-sm">${account?.balance.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">Day's P&L</span>
-                <span className={`text-sm ${account?.dailyPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  ${(account?.dailyPnl || 0).toLocaleString()}
-                </span>
-              </div>
-            </div>
-          </Card>
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">
