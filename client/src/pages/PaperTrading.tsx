@@ -12,6 +12,8 @@ import { ArrowLeft, TrendingUp, TrendingDown } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { PaperTradingLeaderboard } from "@/components/PaperTradingLeaderboard";
+import { Watchlist } from "@/components/Watchlist";
+import { TradeHistory } from "@/components/TradeHistory";
 import { StockChart } from "@/components/StockChart";
 import { Toggle } from "@/components/ui/toggle";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -295,6 +297,8 @@ export default function PaperTrading() {
 
           {/* Sidebar - 4 columns */}
           <div className="md:col-span-4 space-y-6">
+            <Watchlist />
+            <TradeHistory />
             <PaperTradingLeaderboard />
           </div>
         </div>
