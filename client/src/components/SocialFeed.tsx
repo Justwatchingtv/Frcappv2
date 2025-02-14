@@ -211,21 +211,6 @@ export function SocialFeed() {
           <DialogHeader>
             <DialogTitle>Social Board</DialogTitle>
           </DialogHeader>
-          <form
-            onSubmit={form.handleSubmit((data) => createPost.mutate(data))}
-            className="space-y-4 px-4 mb-4"
-          >
-            <Textarea
-              placeholder="Share your market analysis..."
-              {...form.register("content")}
-            />
-            <Button type="submit" disabled={createPost.isPending}>
-              {createPost.isPending && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Post
-            </Button>
-          </form>
           <Tabs defaultValue="following" className="h-full">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="following">
