@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -13,8 +14,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Link from 'next/link'; // Added import for Link component
-
 
 export function OptionsFlow() {
   const [selectedTab, setSelectedTab] = useState("flow");
@@ -26,7 +25,7 @@ export function OptionsFlow() {
 
   const filterFlowByTab = (flow: any[], tab: string) => {
     if (!flow) return [];
-
+    
     switch (tab) {
       case 'scalps':
         return flow.filter(item => item.premium <= 5); // $5 or less
@@ -90,11 +89,7 @@ export function OptionsFlow() {
                 <TableCell>
                   {item.timestamp ? format(new Date(parseInt(item.timestamp)), 'HH:mm:ss') : 'N/A'}
                 </TableCell>
-                <TableCell>
-                  <Link href={`/ticker/${item.ticker}`} className="text-primary hover:underline"> {/* Corrected to use item.ticker and TableCell */}
-                    {item.ticker}
-                  </Link>
-                </TableCell>
+                <TableCell className="font-medium">{item.ticker}</TableCell>
                 <TableCell>
                   <Badge variant={item.type === 'call' ? 'default' : 'destructive'}>
                     {item.type.toUpperCase()}
