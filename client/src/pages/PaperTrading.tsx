@@ -150,41 +150,40 @@ export default function PaperTrading() {
 
         <div className="grid gap-6 md:grid-cols-3">
           <div className="md:col-span-2 space-y-6">
-            {/* Account Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Account Balance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    ${account?.balance.toLocaleString()}
+            {/* Account Details */}
+            <Card className="p-4">
+              <CardHeader>
+                <CardTitle>Paper Account Details</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium">Net Account Value(USD)</span>
+                    <span className="text-sm">${account?.balance.toLocaleString()}</span>
                   </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Total P&L</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className={`text-2xl font-bold ${account?.totalPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {account?.totalPnl >= 0 ? '+' : ''}${account?.totalPnl.toLocaleString()}
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium">Overall P&L</span>
+                    <span className={`text-sm ${account?.totalPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      {account?.totalPnl >= 0 ? '+' : ''}{((account?.totalPnl || 0) / 100000 * 100).toFixed(2)}%
+                    </span>
                   </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Daily P&L</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className={`text-2xl font-bold ${account?.dailyPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {account?.dailyPnl >= 0 ? '+' : ''}${account?.dailyPnl.toLocaleString()}
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium">Market Value</span>
+                    <span className="text-sm">$0.00</span>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium">Buying Power</span>
+                    <span className="text-sm">${account?.balance.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium">Day's P&L</span>
+                    <span className={`text-sm ${account?.dailyPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      ${(account?.dailyPnl || 0).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Trade Form and Positions */}
             <div className="grid md:grid-cols-2 gap-6">
