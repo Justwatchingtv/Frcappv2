@@ -73,8 +73,8 @@ export default function AuthPage() {
             </form>
           </Form>
           <Button
-            variant="link"
-            className="mt-4 w-full"
+            variant="ghost"
+            className="mt-4 w-full hover:bg-primary/10 text-primary"
             onClick={() => setIsLogin(!isLogin)}
           >
             {isLogin ? "Need an account? Register" : "Have an account? Login"}
