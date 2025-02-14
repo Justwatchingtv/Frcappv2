@@ -224,7 +224,7 @@ export default function LargeOptionTrades() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {flow?.filter(item => item.premium >= 1000000).map((item) => (
+                      {flow?.filter(item => item.premium >= 500000).map((item) => (
                         <TableRow key={item.id}>
                           <TableCell>
                             {item.timestamp ? format(new Date(item.timestamp), "HH:mm:ss") : "-"}
