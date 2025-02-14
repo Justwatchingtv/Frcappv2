@@ -21,6 +21,12 @@ export function OptionsFlow() {
   const { data: flow, isLoading } = useQuery({
     queryKey: ["/api/options-flow"],
     refetchInterval: 5000,
+    onSuccess: (data) => {
+      console.log('Options flow data:', data);
+    },
+    onError: (error) => {
+      console.error('Options flow error:', error);
+    }
   });
 
   const filterFlowByTab = (flow: any[], tab: string) => {
@@ -87,7 +93,7 @@ export function OptionsFlow() {
             {filteredFlow?.map((item: any) => (
               <TableRow key={item.id}>
                 <TableCell>
-                  {format(new Date(Number(item.timestamp)), 'HH:mm:ss')}
+                  {item.timestamp ? format(new Date(item.timestamp), 'HH:mm:ss') : 'N/A'}
                 </TableCell>
                 <TableCell className="font-medium">{item.ticker}</TableCell>
                 <TableCell>
