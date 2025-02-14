@@ -39,6 +39,7 @@ export function OptionsFlow() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Time</TableHead>
               <TableHead>Ticker</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Strike</TableHead>
@@ -50,6 +51,7 @@ export function OptionsFlow() {
           <TableBody>
             {flow?.map((item: any) => (
               <TableRow key={item.id}>
+                <TableCell>{format(new Date(item.timestamp), 'HH:mm:ss')}</TableCell>
                 <TableCell className="font-medium">{item.ticker}</TableCell>
                 <TableCell>
                   <Badge variant={item.type === 'call' ? 'default' : 'destructive'}>
