@@ -13,35 +13,34 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { OptionsFlowFilters, Filters } from "./OptionsFlowFilters";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function OptionsFlow() {
-  const [filters, setFilters] = useState<Filters>({
-    unusual: false,
-    scalp: false,
-    golden: false,
-  });
+  const [selectedTab, setSelectedTab] = useState("flow");
 
   const { data: flow, isLoading } = useQuery({
     queryKey: ["/api/options-flow"],
     refetchInterval: 5000,
-    staleTime: 1000,
   });
 
-  const filteredFlow = flow?.filter((item: any) => {
-    if (!filters.unusual && !filters.scalp && !filters.golden) {
-      return true;
+  const filterFlowByTab = (flow: any[], tab: string) => {
+    if (!flow) return [];
+    
+    switch (tab) {
+      case 'scalps':
+        return flow.filter(item => item.premium <= 5); // $5 or less
+      case 'unusual':
+        return flow.filter(item => item.volume >= 1000);
+      case 'golden':
+        return flow.filter(item => item.volume >= 1000 && item.premium >= 10);
+      case 'premium':
+        return flow.filter(item => item.premium * item.volume >= 100000); // $100k+
+      default:
+        return flow;
     }
+  };
 
-    const volume = item.volume;
-    const premium = item.premium / 100; // Convert to dollars
-
-    return (
-      (filters.unusual && volume > 1000) ||
-      (filters.scalp && premium <= 0.05) ||
-      (filters.golden && volume > 1000 && premium > 0.10)
-    );
-  });
+  const filteredFlow = filterFlowByTab(flow, selectedTab);
 
   if (isLoading) {
     return (
@@ -60,7 +59,16 @@ export function OptionsFlow() {
     <Card className="bg-gray-900">
       <CardHeader>
         <CardTitle>Options Flow</CardTitle>
-        <OptionsFlowFilters filters={filters} onFilterChange={setFilters} />
+        <Tabs defaultValue="flow" className="w-full" onValueChange={setSelectedTab}>
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="flow">Flow Feed</TabsTrigger>
+            <TabsTrigger value="scalps">Scalps</TabsTrigger>
+            <TabsTrigger value="unusual">Unusual</TabsTrigger>
+            <TabsTrigger value="golden">Golden Sweeps</TabsTrigger>
+            <TabsTrigger value="frc">FRC AI Sweeps</TabsTrigger>
+            <TabsTrigger value="premium">Premium ($100K+)</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </CardHeader>
       <CardContent>
         <Table>
@@ -79,7 +87,7 @@ export function OptionsFlow() {
             {filteredFlow?.map((item: any) => (
               <TableRow key={item.id}>
                 <TableCell>
-                  {item.timestamp ? format(new Date(parseInt(item.timestamp)), 'HH:mm:ss') : '-'}
+                  {format(new Date(item.timestamp), 'HH:mm:ss')}
                 </TableCell>
                 <TableCell className="font-medium">{item.ticker}</TableCell>
                 <TableCell>
