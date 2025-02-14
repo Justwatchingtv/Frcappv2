@@ -38,11 +38,12 @@ export default function LargeOptionTrades() {
         </div>
 
         <Tabs defaultValue="flow" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="flow">Flow Feed</TabsTrigger>
             <TabsTrigger value="scalps">Scalps</TabsTrigger>
             <TabsTrigger value="unusual">Unusual</TabsTrigger>
             <TabsTrigger value="golden">Golden Sweeps</TabsTrigger>
+            <TabsTrigger value="million">$1M+</TabsTrigger>
             <TabsTrigger value="frc">FRC AI Sweeps</TabsTrigger>
           </TabsList>
 
@@ -224,6 +225,53 @@ export default function LargeOptionTrades() {
                     </TableHeader>
                     <TableBody>
                       {flow?.filter(item => item.premium >= 500000).map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell>
+                            {item.timestamp ? format(new Date(item.timestamp), "HH:mm:ss") : "-"}
+                          </TableCell>
+                          <TableCell>{item.ticker}</TableCell>
+                          <TableCell>
+                            <Badge variant={item.type === "call" ? "default" : "destructive"}>
+                              {item.type.toUpperCase()}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>${item.strike}</TableCell>
+                          <TableCell>{format(new Date(item.expiry), "MM/dd/yyyy")}</TableCell>
+                          <TableCell>{item.volume.toLocaleString()}</TableCell>
+                          <TableCell>${item.premium.toLocaleString()}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="million">
+            <Card>
+              <CardHeader>
+                <CardTitle>Premium $1M+</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="flex justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Time</TableHead>
+                        <TableHead>Symbol</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Strike</TableHead>
+                        <TableHead>Expiry</TableHead>
+                        <TableHead>Size</TableHead>
+                        <TableHead>Premium</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {flow?.filter(item => item.premium >= 1000000).map((item) => (
                         <TableRow key={item.id}>
                           <TableCell>
                             {item.timestamp ? format(new Date(item.timestamp), "HH:mm:ss") : "-"}
