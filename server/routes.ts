@@ -632,6 +632,50 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  app.post("/api/posts/:postId/reactions", async (req, res) => {
+    try {
+      const { postId } = req.params;
+      const { type } = req.body;
+
+      // Remove existing reaction of same type if exists
+      await db.delete(reactions)
+        .where(and(
+          eq(reactions.postId, postId),
+          eq(reactions.userId, req.user!.id),
+          eq(reactions.type, type)
+        ));
+
+      // Add new reaction
+      const reaction = await db.insert(reactions).values({
+        postId,
+        userId: req.user!.id,
+        type,
+      });
+
+      res.json(reaction);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to add reaction" });
+    }
+  });
+
+  app.post("/api/posts/:postId/comments", async (req, res) => {
+    try {
+      const { postId } = req.params;
+      const { content } = req.body;
+
+      const comment = await db.insert(comments).values({
+        postId,
+        userId: req.user!.id,
+        content,
+      });
+
+      res.json(comment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to add comment" });
+    }
+  });
+
+
   const httpServer = createServer(app);
   return httpServer;
 }

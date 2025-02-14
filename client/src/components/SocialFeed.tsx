@@ -58,6 +58,38 @@ export function SocialFeed() {
     },
   });
 
+  const addReaction = useMutation({
+    mutationFn: async ({ postId, type }: { postId: string; type: string }) => {
+      const response = await fetch(`/api/posts/${postId}/reactions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ type }),
+      });
+      if (!response.ok) throw new Error("Failed to add reaction");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
+    },
+  });
+
+  const addComment = useMutation({
+    mutationFn: async ({ postId, content }: { postId: string; content: string }) => {
+      const response = await fetch(`/api/posts/${postId}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ content }),
+      });
+      if (!response.ok) throw new Error("Failed to add comment");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
+    },
+  });
+
   if (isLoading) {
     return (
       <Card>
@@ -118,6 +150,56 @@ export function SocialFeed() {
                   )}
                 </div>
                 <p className="text-sm">{post.content}</p>
+                <div className="flex items-center gap-2 pt-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => addReaction.mutate({ postId: post.id, type: 'like' })}
+                  >
+                    <ThumbsUp className={`h-4 w-4 mr-1 ${post.reactions?.some(r => r.type === 'like' && r.userId === user?.id) ? 'fill-primary' : ''}`} />
+                    {post.reactions?.filter(r => r.type === 'like').length || 0}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => addReaction.mutate({ postId: post.id, type: 'bullish' })}
+                  >
+                    <TrendingUp className={`h-4 w-4 mr-1 ${post.reactions?.some(r => r.type === 'bullish' && r.userId === user?.id) ? 'fill-green-500' : ''}`} />
+                    {post.reactions?.filter(r => r.type === 'bullish').length || 0}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => addReaction.mutate({ postId: post.id, type: 'bearish' })}
+                  >
+                    <TrendingDown className={`h-4 w-4 mr-1 ${post.reactions?.some(r => r.type === 'bearish' && r.userId === user?.id) ? 'fill-red-500' : ''}`} />
+                    {post.reactions?.filter(r => r.type === 'bearish').length || 0}
+                  </Button>
+                </div>
+                {post.comments && post.comments.length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    {post.comments.map((comment: any) => (
+                      <div key={comment.id} className="bg-muted rounded p-2">
+                        <p className="text-sm font-medium">{comment.user.username}</p>
+                        <p className="text-sm">{comment.content}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="flex items-center gap-2 mt-2">
+                  <Input
+                    placeholder="Add a comment..."
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        const content = (e.target as HTMLInputElement).value;
+                        if (content.trim()) {
+                          addComment.mutate({ postId: post.id, content });
+                          (e.target as HTMLInputElement).value = '';
+                        }
+                      }
+                    }}
+                  />
+                </div>
               </div>
             ))}
           </div>
