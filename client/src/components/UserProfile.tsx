@@ -48,8 +48,8 @@ type ProfileFormData = {
 
 export function UserProfile() {
   const { user: currentUser } = useUser();
-  const [, params] = useLocation();
-  const username = params?.split('/').pop() || currentUser?.username;
+  const [location] = useLocation();
+  const username = location?.split('/').pop() || currentUser?.username;
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
 
