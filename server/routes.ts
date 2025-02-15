@@ -489,39 +489,20 @@ export function registerRoutes(app: Express): Server {
   // Get earnings calendar
   app.get("/api/markets/earnings", async (_req, res) => {
     try {
-      const API_KEY = process.env.POLYGON_API_KEY;
-      if (!API_KEY) {
-        throw new Error("POLYGON_API_KEY not found");
-      }
-
-      // Get today's date in YYYY-MM-DD format
-      const today = new Date().toISOString().split('T')[0];
-      
-      const response = await fetch(
-        `https://api.polygon.io/v3/reference/earnings?date.gte=${today}&apiKey=${API_KEY}`,
+      // Mock data - Replace with actual earnings calendar API
+      const earnings = [
         {
-          headers: {
-            'Accept': 'application/json'
-          }
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Polygon API error: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      const earnings = data.results.map((event: any) => ({
-        symbol: event.symbol,
-        name: event.company_name,
-        date: event.date,
-        time: event.time === 'bmo' ? 'pre' : 'post',
-        expectedEPS: event.estimate_eps || null,
-      }));
+          symbol: "MSFT",
+          name: "Microsoft Corporation",
+          date: new Date().toISOString(),
+          time: "post",
+          expectedEPS: 2.65,
+        },
+        // Add more mock earnings events
+      ];
 
       res.json(earnings);
     } catch (error) {
-      console.error("Error fetching earnings calendar:", error);
       res.status(500).send("Error fetching earnings calendar");
     }
   });
