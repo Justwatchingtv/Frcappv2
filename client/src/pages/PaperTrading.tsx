@@ -124,12 +124,19 @@ export default function PaperTrading() {
 
             {/* Order Entry */}
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Place Order</CardTitle>
+                <Toggle
+                  pressed={orderType === 'options'}
+                  onPressedChange={(pressed) => setOrderType(pressed ? 'options' : 'stocks')}
+                >
+                  {orderType === 'options' ? 'Options Trading' : 'Stock Trading'}
+                </Toggle>
               </CardHeader>
               <CardContent>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit((data) => tradeMutation.mutate(data))} className="space-y-4">
+                {orderType === 'stocks' ? (
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit((data) => tradeMutation.mutate(data))} className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
@@ -255,7 +262,10 @@ export default function PaperTrading() {
                       {tradeMutation.isPending ? "Placing Order..." : "Place Order"}
                     </Button>
                   </form>
-                </Form>
+                  </Form>
+                ) : (
+                  <OptionsChainSimulator />
+                )}
               </CardContent>
             </Card>
 
