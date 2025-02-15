@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,23 +17,61 @@ export function Watchlist() {
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
   const [newSymbol, setNewSymbol] = useState("");
 
-  const addToWatchlist = () => {
+  const fetchStockData = async (symbol: string) => {
+    try {
+      const response = await fetch(
+        `https://yahoo-finance15.p.rapidapi.com/api/yahoo/qu/quote/${symbol}`,
+        {
+          headers: {
+            'X-RapidAPI-Host': 'yahoo-finance15.p.rapidapi.com',
+            'X-RapidAPI-Key': 'e6028ca7e1mshcedd69de9360a63p107b54jsnb7ab54c32578'
+          }
+        }
+      );
+      
+      const data = await response.json();
+      if (data?.body?.[0]) {
+        const stockData = data.body[0];
+        return {
+          symbol: symbol,
+          currentPrice: parseFloat(stockData.regularMarketPrice),
+          priceChange: parseFloat(stockData.regularMarketChange),
+          percentChange: parseFloat(stockData.regularMarketChangePercent),
+          afterHoursChange: stockData.postMarketChangePercent ? parseFloat(stockData.postMarketChangePercent) : 0,
+        };
+      }
+      throw new Error('Invalid data received');
+    } catch (error) {
+      console.error(`Error fetching data for ${symbol}:`, error);
+      return null;
+    }
+  };
+
+  const addToWatchlist = async () => {
     if (!newSymbol) return;
-    // In a real app, you would fetch the price data from an API
-    const mockData: WatchlistItem = {
-      symbol: newSymbol.toUpperCase(),
-      currentPrice: 100 + Math.random() * 100,
-      priceChange: (Math.random() - 0.5) * 10,
-      percentChange: (Math.random() - 0.5) * 5,
-      afterHoursChange: (Math.random() - 0.5) * 2,
-    };
-    setWatchlist([...watchlist, mockData]);
-    setNewSymbol("");
+    
+    const stockData = await fetchStockData(newSymbol.toUpperCase());
+    if (stockData) {
+      setWatchlist(prev => [...prev, stockData]);
+      setNewSymbol("");
+    }
   };
 
   const removeFromWatchlist = (symbol: string) => {
     setWatchlist(watchlist.filter(item => item.symbol !== symbol));
   };
+
+  useEffect(() => {
+    const updatePrices = async () => {
+      const updatedData = await Promise.all(
+        watchlist.map(item => fetchStockData(item.symbol))
+      );
+      setWatchlist(updatedData.filter((item): item is WatchlistItem => item !== null));
+    };
+
+    const interval = setInterval(updatePrices, 10000); // Update every 10 seconds
+    return () => clearInterval(interval);
+  }, [watchlist.length]);
 
   return (
     <Card>
@@ -74,7 +112,7 @@ export function Watchlist() {
                   {item.priceChange.toFixed(2)} ({item.percentChange.toFixed(2)}%)
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  AH: {item.afterHoursChange?.toFixed(2)}%
+                  AH: {item.afterHoursChange.toFixed(2)}%
                 </div>
               </div>
               <Button
