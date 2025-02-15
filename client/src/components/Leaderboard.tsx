@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Trophy, TrendingUp, Activity, User } from "lucide-react";
 import { motion } from "framer-motion";
+import { Link } from "wouter";
 
 type LeaderboardUser = {
   id: number;
