@@ -80,18 +80,31 @@ export function registerRoutes(app: Express): Server {
     }
 
     try {
+      if (!req.body.content) {
+        return res.status(400).send("Content is required");
+      }
+
       const [post] = await db
         .insert(posts)
         .values({
           userId: req.user.id,
           content: req.body.content,
-          ticker: req.body.ticker,
-          analysis: req.body.analysis,
+          ticker: req.body.ticker || null,
+          analysis: req.body.analysis || null,
         })
         .returning();
-      res.json(post);
+
+      const postWithUser = await db.query.posts.findFirst({
+        where: eq(posts.id, post.id),
+        with: {
+          user: true,
+        },
+      });
+      
+      res.json(postWithUser);
     } catch (error) {
-      res.status(500).send("Error creating post");
+      console.error("Error creating post:", error);
+      res.status(500).json({ error: "Error creating post", details: error.message });
     }
   });
 
