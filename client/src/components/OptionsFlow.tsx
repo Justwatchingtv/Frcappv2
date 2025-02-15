@@ -35,7 +35,7 @@ export function OptionsFlow() {
       <CardHeader>
         <CardTitle>Options Flow</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="h-[400px] overflow-auto">
         <Table>
           <TableHeader>
             <TableRow>
