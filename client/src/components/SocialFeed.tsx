@@ -1,7 +1,7 @@
 
-import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -56,6 +56,8 @@ export function SocialFeed() {
     },
   });
 
+  const { toast } = useToast();
+  
   const createPost = useMutation({
     mutationFn: async (data: PostForm) => {
       const response = await fetch("/api/posts", {
@@ -74,8 +76,18 @@ export function SocialFeed() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
       form.reset();
+      toast({
+        title: "Success",
+        description: "Your post was published successfully!",
+        variant: "default",
+      });
     },
     onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to create post. Please try again.",
+        variant: "destructive",
+      });
       console.error("Failed to create post:", error);
     }
   });
