@@ -114,7 +114,7 @@ export default function Home() {
         <CommandInput 
           placeholder="Type a ticker symbol or trader name..." 
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)} 
+          onValueChange={setSearchQuery}
         />
         <CommandList>
           {searchQuery && filteredStocks.length === 0 && filteredUsers.length === 0 ? (
