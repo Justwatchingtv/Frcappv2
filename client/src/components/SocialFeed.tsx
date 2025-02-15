@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -75,7 +76,18 @@ export function SocialFeed() {
       queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
       form.reset();
     },
+    onError: (error) => {
+      console.error("Failed to create post:", error);
+    }
   });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const content = form.getValues("content");
+    if (content.trim()) {
+      createPost.mutate({ content });
+    }
+  };
 
   if (isLoading) {
     return (
