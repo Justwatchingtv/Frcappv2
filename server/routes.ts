@@ -394,49 +394,30 @@ export function registerRoutes(app: Express): Server {
   // Get market news
   app.get("/api/markets/news", async (_req, res) => {
     try {
-      const yahooResponse = await fetch(
-        "https://yahoo-finance15.p.rapidapi.com/api/v1/markets/news",
-        {
-          headers: {
-            "x-rapidapi-host": "yahoo-finance15.p.rapidapi.com",
-            "x-rapidapi-key": process.env.RAPIDAPI_KEY || "",
-          },
-        }
-      );
-
-      const investingResponse = await fetch(
+      const response = await fetch(
         "https://investing-cryptocurrency-markets.p.rapidapi.com/api/v1/markets/news",
         {
+          method: "GET",
           headers: {
-            "x-rapidapi-host": "investing-cryptocurrency-markets.p.rapidapi.com",
-            "x-rapidapi-key": process.env.RAPIDAPI_KEY || "",
+            "X-RapidAPI-Host": "investing-cryptocurrency-markets.p.rapidapi.com",
+            "X-RapidAPI-Key": process.env.RAPIDAPI_KEY || "",
           },
         }
       );
 
-      const [yahooData, investingData] = await Promise.all([
-        yahooResponse.json(),
-        investingResponse.json(),
-      ]);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.statusText}`);
+      }
 
-      const news = [
-        ...(yahooData.news || []).map((item: any) => ({
-          id: item.id || Math.random().toString(),
-          title: item.title,
-          description: item.summary || item.description,
-          source: "Yahoo Finance",
-          url: item.link,
-          timestamp: new Date(item.published_at).toISOString(),
-        })),
-        ...(investingData.data || []).map((item: any) => ({
-          id: item.id || Math.random().toString(),
-          title: item.title,
-          description: item.description,
-          source: "Investing.com",
-          url: item.link,
-          timestamp: new Date(item.published_at).toISOString(),
-        })),
-      ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      const data = await response.json();
+      const news = (data.data || []).map((item: any) => ({
+        id: item.news_ID || Math.random().toString(),
+        title: item.HEADLINE,
+        description: item.BODY,
+        source: item.source || "Investing.com",
+        url: item.news_link,
+        timestamp: new Date(item.last_updated).toISOString(),
+      })).sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
       res.json(news);
     } catch (error) {
