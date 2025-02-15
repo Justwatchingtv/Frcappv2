@@ -429,8 +429,8 @@ export function registerRoutes(app: Express): Server {
   // Get trending symbols
   app.get("/api/markets/trending", async (_req, res) => {
     try {
-      const axios = await import('axios');
-      const cheerio = await import('cheerio');
+      const axios = require('axios');
+      const cheerio = require('cheerio');
       
       const response = await axios.get('https://finviz.com/screener.ashx?v=111&s=ta_topgainers');
       const $ = cheerio.load(response.data);
