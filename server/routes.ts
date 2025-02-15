@@ -619,18 +619,6 @@ export function registerRoutes(app: Express): Server {
     } catch (error) {
       res.status(500).send("Error fetching user profile");
     }
-
-    try {
-      const [userProfile] = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, req.user.id))
-        .limit(1);
-
-      res.json(userProfile);
-    } catch (error) {
-      res.status(500).send("Error fetching user profile");
-    }
   });
 
   app.put("/api/user/profile", async (req, res) => {
