@@ -394,21 +394,53 @@ export function registerRoutes(app: Express): Server {
   // Get market news
   app.get("/api/markets/news", async (_req, res) => {
     try {
-      // Mock data - Replace with actual API calls to investing.com and marketwatch.com
-      const news = [
+      const yahooResponse = await fetch(
+        "https://yahoo-finance15.p.rapidapi.com/api/v1/markets/news",
         {
-          id: "1",
-          title: "Markets Rally on Fed Rate Decision",
-          description: "U.S. stocks surge as Federal Reserve signals potential rate cuts in 2024",
-          source: "investing.com",
-          url: "https://investing.com/news/1",
-          timestamp: new Date().toISOString(),
-        },
-        // Add more mock news items
-      ];
+          headers: {
+            "x-rapidapi-host": "yahoo-finance15.p.rapidapi.com",
+            "x-rapidapi-key": process.env.RAPIDAPI_KEY || "",
+          },
+        }
+      );
+
+      const investingResponse = await fetch(
+        "https://investing-cryptocurrency-markets.p.rapidapi.com/api/v1/markets/news",
+        {
+          headers: {
+            "x-rapidapi-host": "investing-cryptocurrency-markets.p.rapidapi.com",
+            "x-rapidapi-key": process.env.RAPIDAPI_KEY || "",
+          },
+        }
+      );
+
+      const [yahooData, investingData] = await Promise.all([
+        yahooResponse.json(),
+        investingResponse.json(),
+      ]);
+
+      const news = [
+        ...(yahooData.news || []).map((item: any) => ({
+          id: item.id || Math.random().toString(),
+          title: item.title,
+          description: item.summary || item.description,
+          source: "Yahoo Finance",
+          url: item.link,
+          timestamp: new Date(item.published_at).toISOString(),
+        })),
+        ...(investingData.data || []).map((item: any) => ({
+          id: item.id || Math.random().toString(),
+          title: item.title,
+          description: item.description,
+          source: "Investing.com",
+          url: item.link,
+          timestamp: new Date(item.published_at).toISOString(),
+        })),
+      ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
       res.json(news);
     } catch (error) {
+      console.error("Error fetching market news:", error);
       res.status(500).send("Error fetching market news");
     }
   });
