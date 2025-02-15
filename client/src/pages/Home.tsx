@@ -45,9 +45,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
           <h1 className="text-2xl font-bold text-primary">Options Flow</h1>
-          <nav className="flex items-center gap-4">
+          <nav className="flex flex-wrap items-center gap-2 md:gap-4 justify-center">
             <Button 
               variant="outline" 
               className="relative w-[200px] justify-start text-sm text-muted-foreground"
@@ -141,13 +141,17 @@ export default function Home() {
       </CommandDialog>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="space-y-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-8 space-y-8">
-              <TrendingStocks />
-              <OptionsFlow />
+        <div className="space-y-4 md:space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8">
+            <div className="lg:col-span-8 space-y-4 md:space-y-8">
+              <div className="overflow-x-auto">
+                <TrendingStocks />
+              </div>
+              <div className="overflow-x-auto">
+                <OptionsFlow />
+              </div>
             </div>
-            <div className="lg:col-span-4 space-y-8">
+            <div className="lg:col-span-4 space-y-4 md:space-y-8">
               <Leaderboard />
               <SocialFeed />
             </div>
