@@ -24,23 +24,37 @@ export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
 
   // Mock data - Replace with real data from API
-  const trendingStocks = [
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredStocks, setFilteredStocks] = useState([]);
+  const allStocks = [
     { symbol: "AAPL", name: "Apple Inc." },
-    { symbol: "TSLA", name: "Tesla, Inc." },
+    { symbol: "MSFT", name: "Microsoft Corporation" },
+    { symbol: "GOOGL", name: "Alphabet Inc." },
+    { symbol: "AMZN", name: "Amazon.com Inc." },
+    { symbol: "META", name: "Meta Platforms Inc." },
+    { symbol: "TSLA", name: "Tesla Inc." },
     { symbol: "NVDA", name: "NVIDIA Corporation" },
+    { symbol: "JPM", name: "JPMorgan Chase & Co." },
+    { symbol: "BAC", name: "Bank of America Corp." },
+    { symbol: "WMT", name: "Walmart Inc." },
+    { symbol: "PG", name: "Procter & Gamble Co." },
+    { symbol: "JNJ", name: "Johnson & Johnson" },
+    { symbol: "UNH", name: "UnitedHealth Group Inc." },
+    { symbol: "HD", name: "Home Depot Inc." },
+    { symbol: "INTC", name: "Intel Corporation" }
   ];
 
-  const suggestedUsers = [
-    { username: "trader_pro", followers: 1200 },
-    { username: "market_guru", followers: 850 },
-    { username: "options_master", followers: 950 },
-  ];
-
-  const todayNews = [
-    { title: "Market Rally Continues", url: "#" },
-    { title: "Fed Announces Rate Decision", url: "#" },
-    { title: "Tech Stocks Lead Gains", url: "#" },
-  ];
+  useEffect(() => {
+    if (searchQuery) {
+      const filtered = allStocks.filter(stock => 
+        stock.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        stock.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredStocks(filtered);
+    } else {
+      setFilteredStocks(allStocks);
+    }
+  }, [searchQuery]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -89,11 +103,15 @@ export default function Home() {
       </header>
 
       <CommandDialog open={searchOpen} onOpenChange={setSearchOpen}>
-        <CommandInput placeholder="Type a ticker symbol or trader name..." />
+        <CommandInput 
+          placeholder="Type a ticker symbol or company name..." 
+          value={searchQuery}
+          onValueChange={setSearchQuery}
+        />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Trending Stocks">
-            {trendingStocks.map((stock) => (
+          <CommandGroup heading="Stocks">
+            {filteredStocks.map((stock) => (
               <CommandItem
                 key={stock.symbol}
                 onSelect={() => {
