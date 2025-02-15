@@ -524,15 +524,45 @@ export function registerRoutes(app: Express): Server {
   // Get ticker information
   app.get("/api/ticker/:symbol/info", async (req, res) => {
     try {
-      // Mock data - Replace with actual API integration
-      const companyData = {
-        name: "Apple Inc.",
-        description: "Apple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide. The company offers iPhone, a line of smartphones; Mac, a line of personal computers; iPad, a line of multi-purpose tablets; and wearables, home, and accessories comprising AirPods, Apple TV, Apple Watch, Beats products, and HomePod.",
-        sector: "Technology",
-        industry: "Consumer Electronics",
-        employees: 164000,
-        ceo: "Tim Cook",
-        website: "https://www.apple.com"
+      const symbol = req.params.symbol;
+      const mockData = {
+        'AAPL': {
+          name: "Apple Inc.",
+          description: "Apple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide.",
+          sector: "Technology",
+          industry: "Consumer Electronics",
+          employees: 164000,
+          ceo: "Tim Cook",
+          website: "https://www.apple.com"
+        },
+        'TSLA': {
+          name: "Tesla, Inc.",
+          description: "Tesla, Inc. designs, develops, manufactures, and sells electric vehicles and energy generation and storage systems worldwide.",
+          sector: "Automotive",
+          industry: "Auto Manufacturers",
+          employees: 127855,
+          ceo: "Elon Musk",
+          website: "https://www.tesla.com"
+        },
+        'MSFT': {
+          name: "Microsoft Corporation",
+          description: "Microsoft Corporation develops, licenses, and supports software, services, devices, and solutions worldwide.",
+          sector: "Technology",
+          industry: "Software",
+          employees: 221000,
+          ceo: "Satya Nadella",
+          website: "https://www.microsoft.com"
+        }
+      };
+
+      const companyData = mockData[symbol] || {
+        name: `${symbol} Corp`,
+        description: "Company information not available",
+        sector: "Unknown",
+        industry: "Unknown",
+        employees: 0,
+        ceo: "Unknown",
+        website: "#"
       };
 
       res.json(companyData);
