@@ -17,52 +17,30 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function Home() {
   const { user, logout } = useUser();
   const [searchOpen, setSearchOpen] = useState(false);
 
   // Mock data - Replace with real data from API
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredStocks, setFilteredStocks] = useState([]);
-  const allStocks = [
+  const trendingStocks = [
     { symbol: "AAPL", name: "Apple Inc." },
-    { symbol: "MSFT", name: "Microsoft Corporation" },
-    { symbol: "GOOGL", name: "Alphabet Inc." },
-    { symbol: "AMZN", name: "Amazon.com Inc." },
-    { symbol: "META", name: "Meta Platforms Inc." },
-    { symbol: "TSLA", name: "Tesla Inc." },
+    { symbol: "TSLA", name: "Tesla, Inc." },
     { symbol: "NVDA", name: "NVIDIA Corporation" },
-    { symbol: "JPM", name: "JPMorgan Chase & Co." },
-    { symbol: "BAC", name: "Bank of America Corp." },
-    { symbol: "WMT", name: "Walmart Inc." },
-    { symbol: "PG", name: "Procter & Gamble Co." },
-    { symbol: "JNJ", name: "Johnson & Johnson" },
-    { symbol: "UNH", name: "UnitedHealth Group Inc." },
-    { symbol: "HD", name: "Home Depot Inc." },
-    { symbol: "INTC", name: "Intel Corporation" }
   ];
 
   const suggestedUsers = [
-    { username: "tradingpro", followers: 15000 },
-    { username: "optionsguru", followers: 12000 },
-    { username: "techtrader", followers: 9800 },
-    { username: "swingtrader", followers: 8500 },
-    { username: "daytrader", followers: 7200 }
+    { username: "trader_pro", followers: 1200 },
+    { username: "market_guru", followers: 850 },
+    { username: "options_master", followers: 950 },
   ];
 
-  useEffect(() => {
-    if (searchQuery) {
-      const filtered = allStocks.filter(stock => 
-        stock.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        stock.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredStocks(filtered);
-    } else {
-      setFilteredStocks(allStocks);
-    }
-  }, [searchQuery]);
+  const todayNews = [
+    { title: "Market Rally Continues", url: "#" },
+    { title: "Fed Announces Rate Decision", url: "#" },
+    { title: "Tech Stocks Lead Gains", url: "#" },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -111,15 +89,11 @@ export default function Home() {
       </header>
 
       <CommandDialog open={searchOpen} onOpenChange={setSearchOpen}>
-        <CommandInput 
-          placeholder="Type a ticker symbol or company name..." 
-          value={searchQuery}
-          onValueChange={setSearchQuery}
-        />
+        <CommandInput placeholder="Type a ticker symbol or trader name..." />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Stocks">
-            {filteredStocks.map((stock) => (
+          <CommandGroup heading="Trending Stocks">
+            {trendingStocks.map((stock) => (
               <CommandItem
                 key={stock.symbol}
                 onSelect={() => {
