@@ -115,22 +115,64 @@ export function SocialFeed() {
             </div>
             <div className="flex justify-between items-center mt-2">
               <div className="flex gap-2">
-                <Button variant="ghost" size="icon">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => document.getElementById('imageUpload')?.click()}
+                >
                   <Image className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon">
+                <input 
+                  type="file" 
+                  id="imageUpload" 
+                  className="hidden" 
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      // Handle image upload
+                      console.log('Image selected:', file);
+                    }
+                  }}
+                />
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => {
+                    const text = form.getValues('content');
+                    form.setValue('content', `${text} $`);
+                  }}
+                >
                   <LineChart className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon">
-                  <MapPin className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon">
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => {
+                    const text = form.getValues('content');
+                    form.setValue('content', text + ' 😊');
+                  }}
+                >
                   <Smile className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon">
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => {
+                    const text = form.getValues('content');
+                    form.setValue('content', `**${text}**`);
+                  }}
+                >
                   <Bold className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon">
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => {
+                    const text = form.getValues('content');
+                    form.setValue('content', `*${text}*`);
+                  }}
+                >
                   <Italic className="h-4 w-4" />
                 </Button>
               </div>
