@@ -2,6 +2,43 @@
 
 A cutting-edge social trading platform that revolutionizes financial market engagement through technology-driven insights and community collaboration.
 
+## Recent Feature Updates
+
+### 1. Enhanced Options Trading Interface
+- Advanced options chain simulator with real-time data
+- Support for both stock and options trading
+- Position P&L tracking integration
+- Greeks calculations for options positions
+- Real-time WebSocket updates for market data
+
+### 2. Market Data Integration
+- Real-time market news feed from Investing.com
+- Trending stocks dashboard with live updates
+- Enhanced earnings calendar with real company data
+- Market sentiment indicators
+- Top gainers and losers tracking
+
+### 3. Portfolio Management
+- Paper trading account with virtual balance
+- Real-time position tracking
+- Support for both stock and options positions
+- P&L visualization and analytics
+- Risk management tools
+
+### 4. Trading Tools
+- Options chain analysis
+- Greeks calculator
+- Position sizing recommendations
+- Technical indicators
+- Market sentiment analysis
+
+### 5. Real-time Market Updates
+- WebSocket integration for live data
+- Real-time price updates
+- Live options flow data
+- Market news streaming
+- Earnings announcements
+
 ## Features
 
 ### 1. User Authentication & Profile Management
