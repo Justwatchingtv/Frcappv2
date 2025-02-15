@@ -5,7 +5,7 @@ import { TrendingStocks } from "@/components/TrendingStocks";
 import { SocialFeed } from "@/components/SocialFeed";
 import { MarketData } from "@/components/MarketData";
 import { Leaderboard } from "@/components/Leaderboard";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { BarChart2, LineChart, Newspaper, LogOut, Search, User } from "lucide-react";
 import {
   Command,
@@ -17,11 +17,15 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   const { user, logout } = useUser();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredStocks, setFilteredStocks] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [, setLocation] = useLocation();
 
   // Mock data - Replace with real data from API
   const trendingStocks = [
@@ -41,6 +45,24 @@ export default function Home() {
     { title: "Fed Announces Rate Decision", url: "#" },
     { title: "Tech Stocks Lead Gains", url: "#" },
   ];
+
+  useEffect(() => {
+    if (searchQuery) {
+      const filtered = trendingStocks.filter(stock => 
+        stock.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        stock.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredStocks(filtered);
+
+      const filteredSuggestedUsers = suggestedUsers.filter(user =>
+        user.username.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredUsers(filteredSuggestedUsers);
+    } else {
+      setFilteredStocks(trendingStocks);
+      setFilteredUsers(suggestedUsers);
+    }
+  }, [searchQuery]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -89,11 +111,17 @@ export default function Home() {
       </header>
 
       <CommandDialog open={searchOpen} onOpenChange={setSearchOpen}>
-        <CommandInput placeholder="Type a ticker symbol or trader name..." />
+        <CommandInput 
+          placeholder="Type a ticker symbol or trader name..." 
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)} 
+        />
         <CommandList>
-          <CommandEmpty>No results found.</CommandEmpty>
+          {searchQuery && filteredStocks.length === 0 && filteredUsers.length === 0 ? (
+            <CommandEmpty>No results found.</CommandEmpty>
+          ) : null}
           <CommandGroup heading="Trending Stocks">
-            {trendingStocks.map((stock) => (
+            {filteredStocks.map((stock) => (
               <CommandItem
                 key={stock.symbol}
                 onSelect={() => {
@@ -108,12 +136,12 @@ export default function Home() {
           </CommandGroup>
           <CommandSeparator />
           <CommandGroup heading="Popular Traders">
-            {suggestedUsers.map((user) => (
+            {filteredUsers.map((user) => (
               <CommandItem
                 key={user.username}
                 onSelect={() => {
                   setSearchOpen(false);
-                  // TODO: Navigate to user profile
+                  setLocation(`/profile/${user.username}`);
                 }}
               >
                 <span className="font-medium">@{user.username}</span>
