@@ -54,10 +54,27 @@ export function OptionsChainSimulator() {
       }));
     };
 
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      updateOptionsChainWithRealtimeData(data);
-    };
+    const updateOptionsChainWithRealtimeData = (data: any) => {
+    if (data.type === 'trade') {
+      setOptionsChain(prevChain => 
+        prevChain.map((option: any) => {
+          if (option.symbol === data.symbol) {
+            return {
+              ...option,
+              last: data.price,
+              volume: option.volume + data.size
+            };
+          }
+          return option;
+        })
+      );
+    }
+  };
+
+  socket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    updateOptionsChainWithRealtimeData(data);
+  };
 
     setWs(socket);
 
