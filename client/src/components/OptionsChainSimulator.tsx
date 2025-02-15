@@ -1,169 +1,143 @@
-
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
+import { ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
 
-interface Position {
-  id: string;
-  type: 'call' | 'put';
+interface OptionsChain {
   strike: number;
-  price: number;
-  quantity: number;
-  isBuy: boolean;
-  timestamp: string;
-  currentPrice?: number;
-  pnl?: number;
-  greeks?: {
-    delta: number;
-    gamma: number;
-    theta: number;
-    vega: number;
-    rho: number;
+  calls: {
+    bid: number;
+    ask: number;
+    volume: number;
+  };
+  puts: {
+    bid: number;
+    ask: number;
+    volume: number;
   };
 }
 
-interface Greeks {
+interface Position {
+  type: 'call' | 'put';
+  strike: number;
+  quantity: number;
+  entry: number;
+  current: number;
+  pnl: number;
   delta: number;
-  gamma: number;
-  theta: number;
-  vega: number;
-  rho: number;
 }
 
 export function OptionsChainSimulator() {
   const { toast } = useToast();
-  const [ticker, setTicker] = useState('SPY');
-  const [ws, setWs] = useState<WebSocket | null>(null);
+  const [symbol, setSymbol] = useState('SPY');
+  const [expiryDate, setExpiryDate] = useState('14 Feb 25');
+  const [optionsChain, setOptionsChain] = useState<OptionsChain[]>([
+    { strike: 607, calls: { bid: 2.59, ask: 3.00, volume: 150 }, puts: { bid: 0.00, ask: 0.0, volume: 0 } },
+    { strike: 608, calls: { bid: 1.62, ask: 2.05, volume: 89 }, puts: { bid: 0.00, ask: 0.0, volume: 0 } },
+    { strike: 609, calls: { bid: 0.78, ask: 0.90, volume: 234 }, puts: { bid: 0.00, ask: 0.0, volume: 0 } },
+    { strike: 610, calls: { bid: 0.02, ask: 0.03, volume: 567 }, puts: { bid: 0.18, ask: 0.2, volume: 123 } },
+    { strike: 611, calls: { bid: 0.00, ask: 0.01, volume: 89 }, puts: { bid: 1.11, ask: 1.2, volume: 445 } },
+    { strike: 612, calls: { bid: 0.00, ask: 0.01, volume: 34 }, puts: { bid: 2.02, ask: 2.5, volume: 234 } },
+    { strike: 613, calls: { bid: 0.00, ask: 0.01, volume: 12 }, puts: { bid: 2.98, ask: 3.5, volume: 567 } },
+    { strike: 614, calls: { bid: 0.00, ask: 0.01, volume: 5 }, puts: { bid: 3.64, ask: 4.7, volume: 89 } },
+  ]);
+
   const [positions, setPositions] = useState<Position[]>([]);
-  const [optionsChain, setOptionsChain] = useState([]);
-  const [selectedExpiry, setSelectedExpiry] = useState('');
-  const [quantity, setQuantity] = useState(1);
 
-  // Initialize WebSocket connection
-  useEffect(() => {
-    const socket = new WebSocket(`wss://delayed.polygon.io/options`);
-    
-    socket.onopen = () => {
-      socket.send(JSON.stringify({
-        action: 'subscribe',
-        params: `O.${ticker}`
-      }));
-    };
-
-    const updateOptionsChainWithRealtimeData = (data: any) => {
-    if (data.type === 'trade') {
-      setOptionsChain(prevChain => 
-        prevChain.map((option: any) => {
-          if (option.symbol === data.symbol) {
-            return {
-              ...option,
-              last: data.price,
-              volume: option.volume + data.size
-            };
-          }
-          return option;
-        })
-      );
-    }
-  };
-
-  socket.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    updateOptionsChainWithRealtimeData(data);
-  };
-
-    setWs(socket);
-
-    return () => {
-      if (socket) {
-        socket.close();
-      }
-    };
-  }, [ticker]);
-
-  // Calculate Greeks using Black-Scholes model
-  const calculateGreeks = useCallback((option: any, spotPrice: number, strike: number, timeToExpiry: number, volatility: number, riskFreeRate: number): Greeks => {
-    // Implementation of Black-Scholes Greeks calculations
-    // This is a simplified version - in production you'd want to use a more robust library
-    return {
-      delta: 0.5, // Placeholder
-      gamma: 0.1,
-      theta: -0.05,
-      vega: 0.2,
-      rho: 0.01
-    };
-  }, []);
-
-  // Update positions with current P&L
-  const updatePositionsPnL = useCallback(() => {
-    setPositions((currentPositions) => 
-      currentPositions.map((position) => {
-        const currentOption = optionsChain.find((opt: any) => 
-          opt.strike === position.strike && 
-          (position.type === 'call' ? opt.call : opt.put)
-        );
-
-        if (!currentOption) return position;
-
-        const currentPrice = position.type === 'call' 
-          ? currentOption.call.last 
-          : currentOption.put.last;
-
-        const pnl = position.isBuy
-          ? (currentPrice - position.price) * position.quantity * 100
-          : (position.price - currentPrice) * position.quantity * 100;
-
-        return {
-          ...position,
-          currentPrice,
-          pnl,
-          greeks: calculateGreeks(
-            currentOption,
-            currentPrice,
-            position.strike,
-            1, // timeToExpiry in years
-            0.3, // implied volatility
-            0.05 // risk-free rate
-          )
-        };
-      })
-    );
-  }, [optionsChain, calculateGreeks]);
-
-  // Execute order with position tracking
-  const executeOrder = useCallback((strike: number, type: 'call' | 'put', isBuy: boolean, price: number) => {
+  const executeOrder = (strike: number, type: 'call' | 'put', quantity: number, price: number) => {
     const newPosition: Position = {
-      id: Math.random().toString(36).substr(2, 9),
       type,
       strike,
-      price,
       quantity,
-      isBuy,
-      timestamp: new Date().toISOString(),
+      entry: price,
+      current: price,
+      pnl: 0,
+      delta: type === 'call' ? 0.45 : -0.45,
     };
 
     setPositions(prev => [...prev, newPosition]);
-    
     toast({
       title: "Order Executed",
-      description: `${isBuy ? 'Bought' : 'Sold'} ${quantity} ${type} ${strike} strike`,
+      description: `${quantity} ${strike} ${type.toUpperCase()} @ $${price}`,
     });
-  }, [quantity, toast]);
-
-  // Regular polling for options chain updates (fallback for non-websocket data)
-  useEffect(() => {
-    const interval = setInterval(updatePositionsPnL, 5000);
-    return () => clearInterval(interval);
-  }, [updatePositionsPnL]);
+  };
 
   return (
     <div className="space-y-4">
-      {/* ... Rest of the UI implementation from the provided code ... */}
-      <div className="mt-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Input 
+            value={symbol}
+            onChange={(e) => setSymbol(e.target.value)}
+            className="w-24"
+            placeholder="Symbol"
+          />
+          <Select value={expiryDate} onValueChange={setExpiryDate}>
+            <SelectTrigger className="w-32">
+              <SelectValue>{expiryDate}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="14 Feb 25">14 Feb 25</SelectItem>
+              <SelectItem value="21 Feb 25">21 Feb 25</SelectItem>
+              <SelectItem value="28 Feb 25">28 Feb 25</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <Button variant="outline" size="icon">
+          <Maximize2 className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-muted/50">
+            <TableHead className="w-[100px]">Calls</TableHead>
+            <TableHead className="text-right">Bid</TableHead>
+            <TableHead className="text-right">Ask</TableHead>
+            <TableHead className="text-center">Strike</TableHead>
+            <TableHead className="text-right">Bid</TableHead>
+            <TableHead className="text-right">Ask</TableHead>
+            <TableHead className="w-[100px] text-right">Puts</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {optionsChain.map((option) => (
+            <TableRow key={option.strike}>
+              <TableCell>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => executeOrder(option.strike, 'call', 1, option.calls.ask)}
+                >
+                  Buy
+                </Button>
+              </TableCell>
+              <TableCell className="text-right">{option.calls.bid.toFixed(2)}</TableCell>
+              <TableCell className="text-right">{option.calls.ask.toFixed(2)}</TableCell>
+              <TableCell className="text-center font-medium">{option.strike}</TableCell>
+              <TableCell className="text-right">{option.puts.bid.toFixed(2)}</TableCell>
+              <TableCell className="text-right">{option.puts.ask.toFixed(2)}</TableCell>
+              <TableCell>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="ml-auto"
+                  onClick={() => executeOrder(option.strike, 'put', 1, option.puts.ask)}
+                >
+                  Buy
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      <div className="mt-8">
         <h3 className="text-lg font-semibold mb-4">Positions & P&L</h3>
         <Table>
           <TableHeader>
@@ -175,24 +149,20 @@ export function OptionsChainSimulator() {
               <TableHead>Current</TableHead>
               <TableHead>P&L</TableHead>
               <TableHead>Delta</TableHead>
-              <TableHead>Gamma</TableHead>
-              <TableHead>Theta</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {positions.map((position) => (
-              <TableRow key={position.id}>
+            {positions.map((position, index) => (
+              <TableRow key={index}>
                 <TableCell className="capitalize">{position.type}</TableCell>
                 <TableCell>{position.strike}</TableCell>
                 <TableCell>{position.quantity}</TableCell>
-                <TableCell>${position.price.toFixed(2)}</TableCell>
-                <TableCell>${position.currentPrice?.toFixed(2) || '-'}</TableCell>
-                <TableCell className={position.pnl && position.pnl >= 0 ? 'text-green-500' : 'text-red-500'}>
-                  ${position.pnl?.toFixed(2) || '-'}
+                <TableCell>${position.entry.toFixed(2)}</TableCell>
+                <TableCell>${position.current.toFixed(2)}</TableCell>
+                <TableCell className={position.pnl >= 0 ? 'text-green-500' : 'text-red-500'}>
+                  ${position.pnl.toFixed(2)}
                 </TableCell>
-                <TableCell>{position.greeks?.delta.toFixed(3)}</TableCell>
-                <TableCell>{position.greeks?.gamma.toFixed(3)}</TableCell>
-                <TableCell>{position.greeks?.theta.toFixed(3)}</TableCell>
+                <TableCell>{position.delta.toFixed(2)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
