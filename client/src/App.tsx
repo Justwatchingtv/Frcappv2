@@ -40,7 +40,7 @@ function App() {
         <Route path="/paper-trading" component={PaperTrading} />
         <Route path="/markets" component={Markets} />
         <Route path="/ticker/:symbol" component={TickerView} />
-        <Route path="/profile" component={UserProfile} />
+        <Route path="/profile/:username?" component={UserProfile} />
       </Switch>
       <Toaster />
     </QueryClientProvider>

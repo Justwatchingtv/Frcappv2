@@ -71,7 +71,9 @@ export function Leaderboard() {
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">{user.username}</span>
+                    <Link href={`/profile/${user.username}`} className="hover:underline">
+                      <span className="font-medium">{user.username}</span>
+                    </Link>
                   </div>
                   <Badge
                     variant={user.totalPnl >= 0 ? "default" : "destructive"}

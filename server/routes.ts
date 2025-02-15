@@ -598,9 +598,26 @@ export function registerRoutes(app: Express): Server {
   });
 
   // User profile routes
-  app.get("/api/user/profile", async (req, res) => {
+  app.get("/api/user/profile/:username?", async (req, res) => {
     if (!req.user) {
       return res.status(401).send("Not authenticated");
+    }
+
+    try {
+      const username = req.params.username || req.user.username;
+      const [userProfile] = await db
+        .select()
+        .from(users)
+        .where(eq(users.username, username))
+        .limit(1);
+
+      if (!userProfile) {
+        return res.status(404).send("User not found");
+      }
+
+      res.json(userProfile);
+    } catch (error) {
+      res.status(500).send("Error fetching user profile");
     }
 
     try {

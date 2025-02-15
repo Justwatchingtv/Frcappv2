@@ -47,9 +47,23 @@ type ProfileFormData = {
 };
 
 export function UserProfile() {
-  const { user } = useUser();
+  const { user: currentUser } = useUser();
+  const [, params] = useLocation();
+  const username = params?.split('/').pop() || currentUser?.username;
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
+
+  const { data: profileUser } = useQuery({
+    queryKey: ['/api/user/profile', username],
+    queryFn: async () => {
+      const response = await fetch(`/api/user/profile/${username}`);
+      if (!response.ok) throw new Error('Failed to fetch user profile');
+      return response.json();
+    },
+  });
+
+  const user = profileUser || currentUser;
+  const isOwnProfile = currentUser?.username === username;
 
   const form = useForm<ProfileFormData>({
     defaultValues: {
