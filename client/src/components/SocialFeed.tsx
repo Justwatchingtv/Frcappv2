@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,12 +11,29 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import { useForm } from "react-hook-form";
 import { useUser } from "@/hooks/use-user";
 import { format } from "date-fns";
-import { Loader2, MessageSquare, TrendingUp, Users, List, Sparkles } from "lucide-react";
+import { 
+  MessageSquare, 
+  TrendingUp, 
+  Users, 
+  List, 
+  Sparkles,
+  Image,
+  LineChart,
+  MapPin,
+  Smile,
+  Bold,
+  Italic,
+  ThumbsUp,
+  MessageCircle,
+  Repeat2,
+  Bookmark
+} from "lucide-react";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type PostForm = {
   content: string;
@@ -65,7 +83,7 @@ export function SocialFeed() {
           <CardTitle>Social Feed</CardTitle>
         </CardHeader>
         <CardContent className="flex justify-center py-8">
-          <Loader2 className="h-8 w-8 animate-spin" />
+          <MessageSquare className="h-8 w-8 animate-spin" />
         </CardContent>
       </Card>
     );
@@ -82,43 +100,90 @@ export function SocialFeed() {
           </Button>
         </CardHeader>
         <CardContent className="space-y-4">
-          <form
-            onSubmit={form.handleSubmit((data) => createPost.mutate(data))}
-            className="space-y-4"
-          >
-            <Textarea
-              placeholder="Share your market analysis..."
-              {...form.register("content")}
-            />
-            <Button type="submit" disabled={createPost.isPending}>
-              {createPost.isPending && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Post
-            </Button>
-          </form>
+          <div className="border rounded-lg p-4">
+            <div className="flex gap-3 mb-2">
+              <Avatar>
+                <AvatarImage src={user?.image} />
+                <AvatarFallback>{user?.username?.[0]}</AvatarFallback>
+              </Avatar>
+              <Textarea
+                placeholder="What's happening in the markets?"
+                className="resize-none"
+                {...form.register("content")}
+              />
+            </div>
+            <div className="flex justify-between items-center mt-2">
+              <div className="flex gap-2">
+                <Button variant="ghost" size="icon">
+                  <Image className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon">
+                  <LineChart className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon">
+                  <MapPin className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon">
+                  <Smile className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon">
+                  <Bold className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon">
+                  <Italic className="h-4 w-4" />
+                </Button>
+              </div>
+              <Button 
+                onClick={form.handleSubmit((data) => createPost.mutate(data))}
+                disabled={createPost.isPending}
+              >
+                Post
+              </Button>
+            </div>
+          </div>
 
           <div className="space-y-4">
             {posts?.map((post: any) => (
-              <div
+              <motion.div
                 key={post.id}
-                className="border border-border rounded-lg p-4 space-y-2"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="border rounded-lg p-4 space-y-2"
               >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-medium">{post.user.username}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {format(new Date(post.createdAt), "PPp")}
-                    </p>
+                <div className="flex gap-3">
+                  <Avatar>
+                    <AvatarImage src={post.user.image} />
+                    <AvatarFallback>{post.user.username[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{post.user.username}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {format(new Date(post.createdAt), "PPp")}
+                      </span>
+                    </div>
+                    <p className="mt-2">{post.content}</p>
+                    <div className="flex gap-4 mt-4">
+                      <Button variant="ghost" size="sm">
+                        <ThumbsUp className="h-4 w-4 mr-2" />
+                        Like
+                      </Button>
+                      <Button variant="ghost" size="sm">
+                        <MessageCircle className="h-4 w-4 mr-2" />
+                        Comment
+                      </Button>
+                      <Button variant="ghost" size="sm">
+                        <Repeat2 className="h-4 w-4 mr-2" />
+                        Share
+                      </Button>
+                      <Button variant="ghost" size="sm">
+                        <Bookmark className="h-4 w-4 mr-2" />
+                        Save
+                      </Button>
+                    </div>
                   </div>
-                  {post.ticker && (
-                    <span className="text-sm font-medium text-primary">
-                      ${post.ticker}
-                    </span>
-                  )}
                 </div>
-                <p className="text-sm">{post.content}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </CardContent>
@@ -152,27 +217,46 @@ export function SocialFeed() {
             <TabsContent value="following" className="h-full">
               <ScrollArea className="h-[calc(80vh-8rem)]">
                 <div className="space-y-4 p-4">
-                  {posts?.filter((post: any) => true).map((post: any) => (
+                  {posts?.map((post: any) => (
                     <motion.div
                       key={post.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="border border-border rounded-lg p-4 space-y-2"
+                      className="border rounded-lg p-4 space-y-2"
                     >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium">{post.user.username}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {format(new Date(post.createdAt), "PPp")}
-                          </p>
+                      <div className="flex gap-3">
+                        <Avatar>
+                          <AvatarImage src={post.user.image} />
+                          <AvatarFallback>{post.user.username[0]}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{post.user.username}</span>
+                            <span className="text-sm text-muted-foreground">
+                              {format(new Date(post.createdAt), "PPp")}
+                            </span>
+                          </div>
+                          <p className="mt-2">{post.content}</p>
+                          <div className="flex gap-4 mt-4">
+                            <Button variant="ghost" size="sm">
+                              <ThumbsUp className="h-4 w-4 mr-2" />
+                              Like
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <MessageCircle className="h-4 w-4 mr-2" />
+                              Comment
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <Repeat2 className="h-4 w-4 mr-2" />
+                              Share
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <Bookmark className="h-4 w-4 mr-2" />
+                              Save
+                            </Button>
+                          </div>
                         </div>
-                        {post.ticker && (
-                          <span className="text-sm font-medium text-primary">
-                            ${post.ticker}
-                          </span>
-                        )}
                       </div>
-                      <p className="text-sm">{post.content}</p>
                     </motion.div>
                   ))}
                 </div>
