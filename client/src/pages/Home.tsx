@@ -17,7 +17,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   const { user, logout } = useUser();
