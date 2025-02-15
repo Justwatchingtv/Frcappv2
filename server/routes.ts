@@ -524,25 +524,15 @@ export function registerRoutes(app: Express): Server {
   // Get ticker information
   app.get("/api/ticker/:symbol/info", async (req, res) => {
     try {
-      const symbol = req.params.symbol;
-      const response = await fetch(
-        `https://financialmodelingprep.com/api/v3/profile/${symbol}?apikey=${process.env.FMP_API_KEY}`,
-      );
-      
-      if (!response.ok) {
-        throw new Error(`API error: ${response.statusText}`);
-      }
-
-      const [data] = await response.json();
-      
+      // Mock data - Replace with actual API integration
       const companyData = {
-        name: data.companyName,
-        description: data.description,
-        sector: data.sector,
-        industry: data.industry,
-        employees: data.fullTimeEmployees,
-        ceo: data.ceo,
-        website: data.website
+        name: "Apple Inc.",
+        description: "Apple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide. The company offers iPhone, a line of smartphones; Mac, a line of personal computers; iPad, a line of multi-purpose tablets; and wearables, home, and accessories comprising AirPods, Apple TV, Apple Watch, Beats products, and HomePod.",
+        sector: "Technology",
+        industry: "Consumer Electronics",
+        employees: 164000,
+        ceo: "Tim Cook",
+        website: "https://www.apple.com"
       };
 
       res.json(companyData);
