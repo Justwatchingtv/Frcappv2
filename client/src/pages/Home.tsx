@@ -44,6 +44,14 @@ export default function Home() {
     { symbol: "INTC", name: "Intel Corporation" }
   ];
 
+  const suggestedUsers = [
+    { username: "tradingpro", followers: 15000 },
+    { username: "optionsguru", followers: 12000 },
+    { username: "techtrader", followers: 9800 },
+    { username: "swingtrader", followers: 8500 },
+    { username: "daytrader", followers: 7200 }
+  ];
+
   useEffect(() => {
     if (searchQuery) {
       const filtered = allStocks.filter(stock => 
