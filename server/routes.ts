@@ -429,22 +429,60 @@ export function registerRoutes(app: Express): Server {
   // Get trending symbols
   app.get("/api/markets/trending", async (_req, res) => {
     try {
-      // Mock data - Replace with actual API integration
-      const trending = [
-        {
-          symbol: "AAPL",
-          name: "Apple Inc.",
-          change: 2.5,
-          volume: 1000000,
-          price: 185.75,
-          mentions: 1250,
-        },
-        // Add more mock symbols
-      ];
+      const axios = require('axios');
+      const cheerio = require('cheerio');
+      
+      const response = await axios.get('https://finviz.com/screener.ashx?v=111&s=ta_topgainers');
+      const $ = cheerio.load(response.data);
+      
+      const gainers = [];
+      const losers = [];
 
-      res.json(trending);
+      // Parse top gainers
+      $('.screener-body-table-nw').each((i, elem) => {
+        if (i < 10) { // Get top 10
+          const row = $(elem).closest('tr');
+          const symbol = $(elem).text().trim();
+          const change = parseFloat(row.find('td:nth-child(8)').text().replace('%', ''));
+          const price = parseFloat(row.find('td:nth-child(9)').text());
+          const volume = parseInt(row.find('td:nth-child(11)').text().replace(/,/g, ''));
+          
+          gainers.push({
+            symbol,
+            name: row.find('td:nth-child(3)').text().trim(),
+            change,
+            volume,
+            price,
+          });
+        }
+      });
+
+      // Get top losers
+      const losersResponse = await axios.get('https://finviz.com/screener.ashx?v=111&s=ta_toplosers');
+      const $losers = cheerio.load(losersResponse.data);
+
+      $losers('.screener-body-table-nw').each((i, elem) => {
+        if (i < 10) {
+          const row = $(elem).closest('tr');
+          const symbol = $(elem).text().trim();
+          const change = parseFloat(row.find('td:nth-child(8)').text().replace('%', ''));
+          const price = parseFloat(row.find('td:nth-child(9)').text());
+          const volume = parseInt(row.find('td:nth-child(11)').text().replace(/,/g, ''));
+          
+          losers.push({
+            symbol,
+            name: row.find('td:nth-child(3)').text().trim(),
+            change,
+            volume,
+            price,
+          });
+        }
+      });
+
+      res.json({ gainers, losers });
     } catch (error) {
-      res.status(500).send("Error fetching trending symbols");
+      console.error("Error fetching market data:", error);
+      res.status(500).send("Error fetching market data");
     }
   });
 

@@ -1,1 +1,1 @@
-{"version":2,"languages":{"nodejs-npm":{"specfileHash":"4961849c1221e11b8e1cb53294f26a8f","lockfileHash":"914400b83869a560102df63107a48ddb","guessedImports":["@replit/vite-plugin-shadcn-theme-json","tailwindcss","tailwindcss-animate","@tailwindcss/typography","vite","@vitejs/plugin-react","@replit/vite-plugin-runtime-error-modal","drizzle-kit"],"guessedImportsHash":"e6cc9d1784f8847ddd97bf5e27ddf512"}}}
+{"version":2,"languages":{"nodejs-npm":{"specfileHash":"c5738c365deceb917e19706710667a00","lockfileHash":"ec7bd58296d6612b61423fe156b2c7f5"}}}

@@ -167,35 +167,39 @@ export default function Markets() {
                       <div>
                         <h3 className="text-sm font-medium mb-2">Top Gainers</h3>
                         <div className="space-y-2">
-                          {trendingSymbols
-                            ?.filter((s) => s.change > 0)
-                            .slice(0, 5)
-                            .map((symbol) => (
-                              <div
-                                key={symbol.symbol}
-                                className="flex items-center justify-between p-2 rounded-lg border"
-                              >
+                          {trendingSymbols?.gainers?.map((symbol) => (
+                            <div
+                              key={symbol.symbol}
+                              className="flex items-center justify-between p-2 rounded-lg border hover:bg-accent/50 transition-colors"
+                            >
+                              <div>
                                 <span className="font-medium">${symbol.symbol}</span>
-                                <span className="text-green-500">+{symbol.change}%</span>
+                                <span className="text-xs text-muted-foreground ml-2">
+                                  ${symbol.price.toFixed(2)}
+                                </span>
                               </div>
-                            ))}
+                              <span className="text-green-500">+{symbol.change}%</span>
+                            </div>
+                          ))}
                         </div>
                       </div>
                       <div>
                         <h3 className="text-sm font-medium mb-2">Top Losers</h3>
                         <div className="space-y-2">
-                          {trendingSymbols
-                            ?.filter((s) => s.change < 0)
-                            .slice(0, 5)
-                            .map((symbol) => (
-                              <div
-                                key={symbol.symbol}
-                                className="flex items-center justify-between p-2 rounded-lg border"
-                              >
+                          {trendingSymbols?.losers?.map((symbol) => (
+                            <div
+                              key={symbol.symbol}
+                              className="flex items-center justify-between p-2 rounded-lg border hover:bg-accent/50 transition-colors"
+                            >
+                              <div>
                                 <span className="font-medium">${symbol.symbol}</span>
-                                <span className="text-red-500">{symbol.change}%</span>
+                                <span className="text-xs text-muted-foreground ml-2">
+                                  ${symbol.price.toFixed(2)}
+                                </span>
                               </div>
-                            ))}
+                              <span className="text-red-500">{symbol.change}%</span>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </div>
