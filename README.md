@@ -68,13 +68,19 @@ A cutting-edge social trading platform that revolutionizes financial market enga
 - Historical options data analysis
 - Integration with Polygon.io for market data
 
-### 4. Paper Trading Simulator
-- Virtual trading environment with $100,000 starting balance
+### 4. Paper Trading System
+- Virtual trading environment with $10,000 starting balance
 - Real-time market data integration
 - Support for various order types
 - Position tracking and management
 - P&L monitoring
 - Risk management tools
+- Balance management features:
+  - Add additional buying power
+  - Reset balance to initial $10,000
+  - Real-time balance updates
+- Complete paper trading leaderboard
+- Transaction history tracking
 
 ### 5. Trading Challenges
 - Create and participate in trading competitions
