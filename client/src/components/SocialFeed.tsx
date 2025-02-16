@@ -55,7 +55,7 @@ export function SocialFeed() {
   const [ws, setWs] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    const socket = new WebSocket(`ws://${window.location.hostname}:5000/ws`);
+    const socket = new WebSocket(`${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.hostname}/ws`);
     
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);

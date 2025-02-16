@@ -5,7 +5,11 @@ import { db } from '@db';
 import { posts } from '@db/schema';
 
 export function setupWebSocket(server: Server) {
-  const wss = new WebSocketServer({ server });
+  const wss = new WebSocketServer({ 
+    server,
+    path: '/ws',
+    clientTracking: true
+  });
 
   wss.on('connection', (ws: WebSocket) => {
     console.log('Client connected');
