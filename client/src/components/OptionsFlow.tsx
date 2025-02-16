@@ -77,7 +77,12 @@ export function OptionsFlow() {
                   </span>
                 </TableCell>
                 <TableCell>{item.volume.toLocaleString()}</TableCell>
-                <TableCell>${(item.premium / 100).toLocaleString()}</TableCell>
+                <TableCell>
+                  ${(item.premium / 100).toLocaleString()}
+                  <span className="text-xs text-muted-foreground ml-1">
+                    (${((item.premium * item.volume) / 100).toLocaleString()} total)
+                  </span>
+                </TableCell>
                 <TableCell>
                   <Button
                     variant="outline"
