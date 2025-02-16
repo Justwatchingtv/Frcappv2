@@ -256,6 +256,30 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Reset paper trading account balance
+  app.post("/api/paper-trading/reset-balance", async (req, res) => {
+    if (!req.user) {
+      return res.status(401).send("Not authenticated");
+    }
+
+    try {
+      const [account] = await db
+        .update(paperTradingAccounts)
+        .set({
+          balance: req.body.balance,
+          totalPnl: 0,
+          dailyPnl: 0,
+          lastResetAt: new Date(),
+        })
+        .where(eq(paperTradingAccounts.userId, req.user.id))
+        .returning();
+
+      res.json(account);
+    } catch (error) {
+      res.status(500).send("Error resetting account");
+    }
+  });
+
   // Get paper trading account details
   app.get("/api/paper-trading/account", async (req, res) => {
     if (!req.user) {

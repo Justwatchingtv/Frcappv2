@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OptionsChainSimulator } from "@/components/OptionsChainSimulator";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,8 @@ interface TradeForm {
 export default function PaperTrading() {
   const { toast } = useToast();
   const [selectedSymbol, setSelectedSymbol] = useState<string>("");
+  const [newBalance, setNewBalance] = useState<number>(0);
+  const queryClient = useQueryClient();
   const [orderType, setOrderType] = useState<'MARKET' | 'LIMIT'>('MARKET');
 
   const { data: account, isLoading: isLoadingAccount } = useQuery({
@@ -116,6 +118,39 @@ export default function PaperTrading() {
                     <div className="text-sm text-muted-foreground">Buying Power</div>
                     <div className="text-2xl font-bold">${account?.balance.toLocaleString()}</div>
                   </div>
+                </div>
+                <div className="mt-4 flex items-center gap-2">
+                  <Input
+                    type="number"
+                    placeholder="Enter new balance"
+                    onChange={(e) => setNewBalance(parseFloat(e.target.value))}
+                    className="w-40"
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={async () => {
+                      try {
+                        await fetch("/api/paper-trading/reset-balance", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ balance: newBalance }),
+                        });
+                        toast({
+                          title: "Account Reset",
+                          description: "Your account balance has been updated.",
+                        });
+                        await queryClient.invalidateQueries({ queryKey: ["/api/paper-trading/account"] });
+                      } catch (error) {
+                        toast({
+                          title: "Error",
+                          description: "Failed to reset account balance.",
+                          variant: "destructive",
+                        });
+                      }
+                    }}
+                  >
+                    Reset Balance
+                  </Button>
                 </div>
               </CardContent>
             </Card>
