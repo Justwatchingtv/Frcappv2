@@ -1,6 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { Link } from "wouter";
@@ -21,6 +24,8 @@ interface OptionsFlow {
 }
 
 export default function LargeOptionTrades() {
+  const isMobile = useIsMobile();
+  const [currentTab, setCurrentTab] = useState("flow");
   const { data: flow, isLoading } = useQuery<OptionsFlow[]>({
     queryKey: ["/api/options-flow"],
     refetchInterval: 5000,
@@ -38,15 +43,30 @@ export default function LargeOptionTrades() {
           <h1 className="text-2xl font-bold">Options Data</h1>
         </div>
 
-        <Tabs defaultValue="flow" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-7">
-            <TabsTrigger value="flow">Flow Feed</TabsTrigger>
-            <TabsTrigger value="scalps">Scalps</TabsTrigger>
-            <TabsTrigger value="unusual">Unusual</TabsTrigger>
-            <TabsTrigger value="golden">Golden Sweeps</TabsTrigger>
-            <TabsTrigger value="explorer">Contract Explorer</TabsTrigger>
-            <TabsTrigger value="frc">FRC AI Sweeps</TabsTrigger>
-          </TabsList>
+        {isMobile ? (
+          <Select onValueChange={(value) => setCurrentTab(value)} defaultValue="flow">
+            <SelectTrigger className="w-full mb-4">
+              <SelectValue placeholder="Select view" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="flow">Flow Feed</SelectItem>
+              <SelectItem value="scalps">Scalps</SelectItem>
+              <SelectItem value="unusual">Unusual</SelectItem>
+              <SelectItem value="golden">Golden Sweeps</SelectItem>
+              <SelectItem value="explorer">Contract Explorer</SelectItem>
+              <SelectItem value="frc">FRC AI Sweeps</SelectItem>
+            </SelectContent>
+          </Select>
+        ) : (
+          <Tabs defaultValue="flow" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-7">
+              <TabsTrigger value="flow">Flow Feed</TabsTrigger>
+              <TabsTrigger value="scalps">Scalps</TabsTrigger>
+              <TabsTrigger value="unusual">Unusual</TabsTrigger>
+              <TabsTrigger value="golden">Golden Sweeps</TabsTrigger>
+              <TabsTrigger value="explorer">Contract Explorer</TabsTrigger>
+              <TabsTrigger value="frc">FRC AI Sweeps</TabsTrigger>
+            </TabsList>
 
           <TabsContent value="flow">
             <Card>
