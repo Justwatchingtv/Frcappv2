@@ -105,17 +105,17 @@ export default function PaperTrading() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <div>
                     <div className="text-sm text-muted-foreground">Net Account Value</div>
-                    <div className="text-2xl font-bold">${account?.balance.toLocaleString()}</div>
+                    <div className="text-2xl font-bold">${account?.balance ? account.balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'}</div>
                   </div>
                   <div>
                     <div className="text-sm text-muted-foreground">Overall P&L</div>
                     <div className={`text-xl font-bold ${account?.totalPnl >= 0 ? 'text-[#00C805]' : 'text-[#FF333A]'}`}>
-                      {account?.totalPnl >= 0 ? '+' : ''}{((account?.totalPnl || 0) / account?.balance * 100).toFixed(2)}%
+                      {account?.totalPnl ? (account.totalPnl >= 0 ? '+' : '') + (account.totalPnl / account.balance * 100).toFixed(2) + '%' : '0.00%'}
                     </div>
                   </div>
                   <div>
                     <div className="text-sm text-muted-foreground">Buying Power</div>
-                    <div className="text-2xl font-bold">${account?.balance.toLocaleString()}</div>
+                    <div className="text-2xl font-bold">${account?.balance ? account.balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'}</div>
                   </div>
                 </div>
                 <div className="mt-4 flex items-center gap-2">
@@ -128,12 +128,21 @@ export default function PaperTrading() {
                   <Button
                     variant="outline"
                     onClick={async () => {
+                      if (!newBalance || newBalance <= 0) {
+                        toast({
+                          title: "Invalid Amount",
+                          description: "Please enter a valid positive amount.",
+                          variant: "destructive",
+                        });
+                        return;
+                      }
                       try {
-                        await fetch("/api/paper-trading/reset-balance", {
+                        const response = await fetch("/api/paper-trading/reset-balance", {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({ balance: newBalance }),
                         });
+                        if (!response.ok) throw new Error(await response.text());
                         toast({
                           title: "Account Reset",
                           description: "Your account balance has been updated.",
@@ -153,17 +162,27 @@ export default function PaperTrading() {
                   <Button
                     variant="secondary"
                     onClick={async () => {
+                      if (!newBalance || newBalance <= 0) {
+                        toast({
+                          title: "Invalid Amount",
+                          description: "Please enter a valid positive amount.",
+                          variant: "destructive",
+                        });
+                        return;
+                      }
                       try {
-                        await fetch("/api/paper-trading/add-balance", {
+                        const response = await fetch("/api/paper-trading/add-balance", {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({ amount: newBalance }),
                         });
+                        if (!response.ok) throw new Error(await response.text());
                         toast({
                           title: "Balance Updated",
                           description: "Additional buying power has been added.",
                         });
                         await queryClient.invalidateQueries({ queryKey: ["/api/paper-trading/account"] });
+                        setNewBalance(0);
                       } catch (error) {
                         toast({
                           title: "Error",
