@@ -100,7 +100,7 @@ export function registerRoutes(app: Express): Server {
           user: true,
         },
       });
-      
+
       res.json(postWithUser);
     } catch (error) {
       console.error("Error creating post:", error);
@@ -521,10 +521,10 @@ export function registerRoutes(app: Express): Server {
     try {
       const axios = require('axios');
       const cheerio = require('cheerio');
-      
+
       const response = await axios.get('https://finviz.com/screener.ashx?v=111&s=ta_topgainers');
       const $ = cheerio.load(response.data);
-      
+
       const gainers = [];
       const losers = [];
 
@@ -536,7 +536,7 @@ export function registerRoutes(app: Express): Server {
           const change = parseFloat(row.find('td:nth-child(8)').text().replace('%', ''));
           const price = parseFloat(row.find('td:nth-child(9)').text());
           const volume = parseInt(row.find('td:nth-child(11)').text().replace(/,/g, ''));
-          
+
           gainers.push({
             symbol,
             name: row.find('td:nth-child(3)').text().trim(),
@@ -558,7 +558,7 @@ export function registerRoutes(app: Express): Server {
           const change = parseFloat(row.find('td:nth-child(8)').text().replace('%', ''));
           const price = parseFloat(row.find('td:nth-child(9)').text());
           const volume = parseInt(row.find('td:nth-child(11)').text().replace(/,/g, ''));
-          
+
           losers.push({
             symbol,
             name: row.find('td:nth-child(3)').text().trim(),

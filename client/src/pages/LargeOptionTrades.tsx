@@ -44,7 +44,8 @@ export default function LargeOptionTrades() {
         </div>
 
         {isMobile ? (
-          <Select onValueChange={(value) => setCurrentTab(value)} defaultValue="flow">
+          <div className="space-y-4">
+            <Select onValueChange={(value) => setCurrentTab(value)} defaultValue="flow">
             <SelectTrigger className="w-full mb-4">
               <SelectValue placeholder="Select view" />
             </SelectTrigger>
@@ -57,6 +58,61 @@ export default function LargeOptionTrades() {
               <SelectItem value="frc">FRC AI Sweeps</SelectItem>
             </SelectContent>
           </Select>
+          <Card>
+            <CardContent className="overflow-x-auto">
+              {isLoading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Time</TableHead>
+                      <TableHead>Symbol</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Strike</TableHead>
+                      <TableHead>Expiry</TableHead>
+                      <TableHead>Size</TableHead>
+                      <TableHead>Volume</TableHead>
+                      <TableHead>Premium</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {flow?.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell>
+                          {item.timestamp ? format(new Date(parseInt(item.timestamp)), "HH:mm:ss") : "-"}
+                        </TableCell>
+                        <TableCell>{item.ticker}</TableCell>
+                        <TableCell>
+                          <Badge variant={item.type === "call" ? "default" : "destructive"}>
+                            {item.type.toUpperCase()}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>${item.strike}</TableCell>
+                        <TableCell>
+                          {format(new Date(item.expiry), "MM/dd/yyyy")}
+                          <span className="text-muted-foreground text-xs ml-2">
+                            ({Math.ceil((new Date(item.expiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}d)
+                          </span>
+                        </TableCell>
+                        <TableCell>{item.size?.toLocaleString() || '-'}</TableCell>
+                        <TableCell>{item.volume.toLocaleString()}</TableCell>
+                        <TableCell>
+                          ${(item.premium / 100).toLocaleString()}
+                          <span className="text-xs text-muted-foreground ml-1">
+                            (${((item.premium * item.volume) / 100).toLocaleString()} total)
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+          </div>
         ) : (
           <Tabs defaultValue="flow" className="space-y-4">
             <TabsList className="grid w-full grid-cols-6">
