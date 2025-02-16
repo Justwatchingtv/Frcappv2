@@ -11,7 +11,7 @@ async function main() {
   console.log("Running migrations...");
   
   try {
-    await migrate(db, { migrationsFolder: "drizzle" });
+    await migrate(db, { migrationsFolder: "migrations" });
     console.log("Migrations completed!");
     process.exit(0);
   } catch (error) {
