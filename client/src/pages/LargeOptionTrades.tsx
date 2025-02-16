@@ -16,6 +16,7 @@ interface OptionsFlow {
   premium: number;
   type: string;
   volume: number;
+  size?: number; // Added size property
   timestamp: string;
 }
 
@@ -67,6 +68,7 @@ export default function LargeOptionTrades() {
                         <TableHead>Strike</TableHead>
                         <TableHead>Expiry</TableHead>
                         <TableHead>Size</TableHead>
+                        <TableHead>Volume</TableHead>
                         <TableHead>Premium</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -83,9 +85,20 @@ export default function LargeOptionTrades() {
                             </Badge>
                           </TableCell>
                           <TableCell>${item.strike}</TableCell>
-                          <TableCell>{format(new Date(item.expiry), "MM/dd/yyyy")}</TableCell>
+                          <TableCell>
+                            {format(new Date(item.expiry), "MM/dd/yyyy")}
+                            <span className="text-muted-foreground text-xs ml-2">
+                              ({Math.ceil((new Date(item.expiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}d)
+                            </span>
+                          </TableCell>
+                          <TableCell>{item.size?.toLocaleString() || '-'}</TableCell>
                           <TableCell>{item.volume.toLocaleString()}</TableCell>
-                          <TableCell>${item.premium.toLocaleString()}</TableCell>
+                          <TableCell>
+                            ${(item.premium / 100).toLocaleString()}
+                            <span className="text-xs text-muted-foreground ml-1">
+                              (${((item.premium * item.volume) / 100).toLocaleString()} total)
+                            </span>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -115,6 +128,7 @@ export default function LargeOptionTrades() {
                         <TableHead>Strike</TableHead>
                         <TableHead>Expiry</TableHead>
                         <TableHead>Size</TableHead>
+                        <TableHead>Volume</TableHead>
                         <TableHead>Premium</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -137,9 +151,20 @@ export default function LargeOptionTrades() {
                             </Badge>
                           </TableCell>
                           <TableCell>${item.strike}</TableCell>
-                          <TableCell>{format(new Date(item.expiry), "MM/dd/yyyy")}</TableCell>
+                          <TableCell>
+                            {format(new Date(item.expiry), "MM/dd/yyyy")}
+                            <span className="text-muted-foreground text-xs ml-2">
+                              ({Math.ceil((new Date(item.expiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}d)
+                            </span>
+                          </TableCell>
+                          <TableCell>{item.size?.toLocaleString() || '-'}</TableCell>
                           <TableCell>{item.volume.toLocaleString()}</TableCell>
-                          <TableCell>${item.premium.toLocaleString()}</TableCell>
+                          <TableCell>
+                            ${(item.premium / 100).toLocaleString()}
+                            <span className="text-xs text-muted-foreground ml-1">
+                              (${((item.premium * item.volume) / 100).toLocaleString()} total)
+                            </span>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -169,6 +194,7 @@ export default function LargeOptionTrades() {
                           <TableHead>Strike</TableHead>
                           <TableHead>Expiry</TableHead>
                           <TableHead>Size</TableHead>
+                          <TableHead>Volume</TableHead>
                           <TableHead>Premium</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -189,9 +215,20 @@ export default function LargeOptionTrades() {
                               </Badge>
                             </TableCell>
                             <TableCell>${item.strike}</TableCell>
-                            <TableCell>{format(new Date(item.expiry), "MM/dd/yyyy")}</TableCell>
+                            <TableCell>
+                              {format(new Date(item.expiry), "MM/dd/yyyy")}
+                              <span className="text-muted-foreground text-xs ml-2">
+                                ({Math.ceil((new Date(item.expiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}d)
+                              </span>
+                            </TableCell>
+                            <TableCell>{item.size?.toLocaleString() || '-'}</TableCell>
                             <TableCell>{item.volume.toLocaleString()}</TableCell>
-                            <TableCell>${item.premium.toLocaleString()}</TableCell>
+                            <TableCell>
+                              ${(item.premium / 100).toLocaleString()}
+                              <span className="text-xs text-muted-foreground ml-1">
+                                (${((item.premium * item.volume) / 100).toLocaleString()} total)
+                              </span>
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -220,6 +257,7 @@ export default function LargeOptionTrades() {
                         <TableHead>Strike</TableHead>
                         <TableHead>Expiry</TableHead>
                         <TableHead>Size</TableHead>
+                        <TableHead>Volume</TableHead>
                         <TableHead>Premium</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -236,9 +274,20 @@ export default function LargeOptionTrades() {
                             </Badge>
                           </TableCell>
                           <TableCell>${item.strike}</TableCell>
-                          <TableCell>{format(new Date(item.expiry), "MM/dd/yyyy")}</TableCell>
+                          <TableCell>
+                            {format(new Date(item.expiry), "MM/dd/yyyy")}
+                            <span className="text-muted-foreground text-xs ml-2">
+                              ({Math.ceil((new Date(item.expiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}d)
+                            </span>
+                          </TableCell>
+                          <TableCell>{item.size?.toLocaleString() || '-'}</TableCell>
                           <TableCell>{item.volume.toLocaleString()}</TableCell>
-                          <TableCell>${item.premium.toLocaleString()}</TableCell>
+                          <TableCell>
+                            ${(item.premium / 100).toLocaleString()}
+                            <span className="text-xs text-muted-foreground ml-1">
+                              (${((item.premium * item.volume) / 100).toLocaleString()} total)
+                            </span>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -267,6 +316,7 @@ export default function LargeOptionTrades() {
                         <TableHead>Strike</TableHead>
                         <TableHead>Expiry</TableHead>
                         <TableHead>Size</TableHead>
+                        <TableHead>Volume</TableHead>
                         <TableHead>Premium</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -283,9 +333,20 @@ export default function LargeOptionTrades() {
                             </Badge>
                           </TableCell>
                           <TableCell>${item.strike}</TableCell>
-                          <TableCell>{format(new Date(item.expiry), "MM/dd/yyyy")}</TableCell>
+                          <TableCell>
+                            {format(new Date(item.expiry), "MM/dd/yyyy")}
+                            <span className="text-muted-foreground text-xs ml-2">
+                              ({Math.ceil((new Date(item.expiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}d)
+                            </span>
+                          </TableCell>
+                          <TableCell>{item.size?.toLocaleString() || '-'}</TableCell>
                           <TableCell>{item.volume.toLocaleString()}</TableCell>
-                          <TableCell>${item.premium.toLocaleString()}</TableCell>
+                          <TableCell>
+                            ${(item.premium / 100).toLocaleString()}
+                            <span className="text-xs text-muted-foreground ml-1">
+                              (${((item.premium * item.volume) / 100).toLocaleString()} total)
+                            </span>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
