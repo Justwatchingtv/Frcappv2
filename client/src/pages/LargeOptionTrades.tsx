@@ -53,7 +53,7 @@ export default function LargeOptionTrades() {
               <CardHeader>
                 <CardTitle>Flow Feed</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="overflow-x-auto">
                 {isLoading ? (
                   <div className="flex justify-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin" />
@@ -113,7 +113,7 @@ export default function LargeOptionTrades() {
               <CardHeader>
                 <CardTitle>Scalps</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="overflow-x-auto">
                 {isLoading ? (
                   <div className="flex justify-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin" />
@@ -179,7 +179,7 @@ export default function LargeOptionTrades() {
                 <CardHeader>
                   <CardTitle>Unusual Activity</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="overflow-x-auto">
                   {isLoading ? (
                     <div className="flex justify-center py-8">
                       <Loader2 className="h-8 w-8 animate-spin" />
@@ -242,7 +242,7 @@ export default function LargeOptionTrades() {
               <CardHeader>
                 <CardTitle>Golden Sweeps</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="overflow-x-auto">
                 {isLoading ? (
                   <div className="flex justify-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin" />
@@ -301,7 +301,7 @@ export default function LargeOptionTrades() {
               <CardHeader>
                 <CardTitle>Premium $1M+</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="overflow-x-auto">
                 {isLoading ? (
                   <div className="flex justify-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin" />
