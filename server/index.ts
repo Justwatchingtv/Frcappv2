@@ -54,8 +54,8 @@ app.use((req, res, next) => {
 
 (async () => {
   const server = registerRoutes(app);
-import { setupWebSocket } from './websocket';
-setupWebSocket(server);
+  const { setupWebSocket } = await import('./websocket');
+  setupWebSocket(server);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
