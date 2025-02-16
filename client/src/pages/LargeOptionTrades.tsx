@@ -43,7 +43,7 @@ export default function LargeOptionTrades() {
             <TabsTrigger value="scalps">Scalps</TabsTrigger>
             <TabsTrigger value="unusual">Unusual</TabsTrigger>
             <TabsTrigger value="golden">Golden Sweeps</TabsTrigger>
-            <TabsTrigger value="million">$1M+</TabsTrigger>
+            <TabsTrigger value="explorer">Contract Explorer</TabsTrigger>
             <TabsTrigger value="frc">FRC AI Sweeps</TabsTrigger>
           </TabsList>
 
