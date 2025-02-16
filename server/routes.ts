@@ -65,7 +65,7 @@ export function registerRoutes(app: Express): Server {
           user: true,
         },
         orderBy: desc(posts.createdAt),
-        limit: 50,
+        limit: 10,
       });
       res.json(feedPosts);
     } catch (error) {
