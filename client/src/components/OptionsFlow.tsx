@@ -54,7 +54,12 @@ export function OptionsFlow() {
                 <TableCell>
                   {item.timestamp ? format(new Date(parseInt(item.timestamp)), 'HH:mm:ss') : '-'}
                 </TableCell>
-                <TableCell className="font-medium">{item.ticker}</TableCell>
+                <TableCell
+                  className="font-medium cursor-pointer hover:text-primary hover:underline"
+                  onClick={() => window.location.href = `/ticker/${item.ticker}`}
+                >
+                  {item.ticker}
+                </TableCell>
                 <TableCell>
                   <Badge variant={item.type === 'call' ? 'default' : 'destructive'}>
                     {item.type.toUpperCase()}
