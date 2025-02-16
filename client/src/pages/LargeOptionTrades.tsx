@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { MenuIcon } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -34,13 +36,43 @@ export default function LargeOptionTrades() {
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="container mx-auto">
-        <div className="mb-6 flex items-center gap-4">
-          <Link href="/">
-            <Button variant="outline" size="icon">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </Link>
-          <h1 className="text-2xl font-bold">Options Data</h1>
+        <div className="mb-6 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <Link href="/">
+              <Button variant="outline" size="icon">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </Link>
+            <h1 className="text-2xl font-bold">Options Data</h1>
+          </div>
+          {isMobile && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <MenuIcon className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <SheetHeader>
+                  <SheetTitle>Navigation</SheetTitle>
+                </SheetHeader>
+                <div className="mt-4 space-y-2">
+                  <Link href="/markets">
+                    <Button variant="ghost" className="w-full justify-start">Markets</Button>
+                  </Link>
+                  <Link href="/paper-trading">
+                    <Button variant="ghost" className="w-full justify-start">Paper Trading</Button>
+                  </Link>
+                  <Link href="/large-option-trades">
+                    <Button variant="ghost" className="w-full justify-start">Large Option Trades</Button>
+                  </Link>
+                  <Link href="/challenges">
+                    <Button variant="ghost" className="w-full justify-start">Challenges</Button>
+                  </Link>
+                </div>
+              </SheetContent>
+            </Sheet>
+          )}
         </div>
 
         {isMobile ? (
