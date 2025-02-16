@@ -8,7 +8,8 @@ export function setupWebSocket(server: Server) {
   const wss = new WebSocketServer({ 
     server,
     path: '/ws',
-    clientTracking: true
+    clientTracking: true,
+    perMessageDeflate: false
   });
 
   wss.on('connection', (ws: WebSocket) => {
