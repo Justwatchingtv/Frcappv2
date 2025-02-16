@@ -70,7 +70,12 @@ export function OptionsFlow() {
                   </Badge>
                 </TableCell>
                 <TableCell>${item.strike}</TableCell>
-                <TableCell>{format(new Date(item.expiry), 'MM/dd/yyyy')}</TableCell>
+                <TableCell>
+                  {format(new Date(item.expiry), 'MM/dd/yyyy')}
+                  <span className="text-muted-foreground text-xs ml-2">
+                    ({Math.ceil((new Date(item.expiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}d)
+                  </span>
+                </TableCell>
                 <TableCell>{item.volume.toLocaleString()}</TableCell>
                 <TableCell>${(item.premium / 100).toLocaleString()}</TableCell>
                 <TableCell>
