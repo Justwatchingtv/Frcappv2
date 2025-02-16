@@ -6,6 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, TrendingUp, TrendingDown, ThumbsUp, ThumbsDown } from "lucide-react";
 import { Link, useRoute } from "wouter";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { format } from "date-fns";
 
 interface CompanyData {
   name: string;
@@ -48,6 +51,10 @@ export default function TickerView() {
 
   const { data: earnings } = useQuery<EarningsData[]>({
     queryKey: [`/api/ticker/${symbol}/earnings`],
+  });
+
+  const { data: posts } = useQuery({
+    queryKey: ["/api/posts"],
   });
 
   return (
@@ -123,36 +130,77 @@ export default function TickerView() {
           </TabsContent>
 
           <TabsContent value="sentiment">
-            <Card>
-              <CardHeader>
-                <CardTitle>Market Sentiment</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col items-center gap-6">
-                  <p className="text-lg">What's your outlook on ${symbol}?</p>
-                  <div className="flex gap-4">
-                    <Button
-                      size="lg"
-                      variant={sentiment === "bullish" ? "default" : "outline"}
-                      className="w-40"
-                      onClick={() => setSentiment("bullish")}
-                    >
-                      <ThumbsUp className="mr-2 h-5 w-5" />
-                      Bullish
-                    </Button>
-                    <Button
-                      size="lg"
-                      variant={sentiment === "bearish" ? "default" : "outline"}
-                      className="w-40"
-                      onClick={() => setSentiment("bearish")}
-                    >
-                      <ThumbsDown className="mr-2 h-5 w-5" />
-                      Bearish
-                    </Button>
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Market Sentiment</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col items-center gap-6">
+                    <p className="text-lg">What's your outlook on ${symbol}?</p>
+                    <div className="flex gap-4">
+                      <Button
+                        size="lg"
+                        variant={sentiment === "bullish" ? "default" : "outline"}
+                        className="w-40"
+                        onClick={() => setSentiment("bullish")}
+                      >
+                        <ThumbsUp className="mr-2 h-5 w-5" />
+                        Bullish
+                      </Button>
+                      <Button
+                        size="lg"
+                        variant={sentiment === "bearish" ? "default" : "outline"}
+                        className="w-40"
+                        onClick={() => setSentiment("bearish")}
+                      >
+                        <ThumbsDown className="mr-2 h-5 w-5" />
+                        Bearish
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Discussions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="h-[400px]">
+                    <div className="space-y-4">
+                      {posts?.filter(post => 
+                        post.content.toLowerCase().includes(symbol.toLowerCase()) ||
+                        post.content.includes(`$${symbol}`)
+                      ).map((post) => (
+                        <div key={post.id} className="p-4 border rounded-lg">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Avatar>
+                              <AvatarImage src={post.user.image} />
+                              <AvatarFallback>{post.user.username[0]}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div className="font-medium">{post.user.username}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {format(new Date(post.createdAt), "PPp")}
+                              </div>
+                            </div>
+                          </div>
+                          <p className="whitespace-pre-wrap">{post.content}</p>
+                          <div className="flex gap-2 mt-2">
+                            {Object.entries(post.reactions || {}).map(([emoji, count]) => (
+                              <span key={emoji} className="text-sm text-muted-foreground">
+                                {emoji} {count}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="earnings">
