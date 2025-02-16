@@ -56,13 +56,21 @@ export default function PaperTrading() {
 
   const tradeMutation = useMutation({
     mutationFn: async (data: TradeForm) => {
-      const response = await fetch("/api/paper-trading/trade", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error(await response.text());
-      return response.json();
+      try {
+        const response = await fetch("/api/paper-trading/trade", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText || 'Failed to execute trade');
+        }
+        return response.json();
+      } catch (error) {
+        console.error('Trade execution error:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       toast({
