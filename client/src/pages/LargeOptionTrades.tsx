@@ -19,7 +19,7 @@ interface OptionsFlow {
   premium: number;
   type: string;
   volume: number;
-  size?: number; // Added size property
+  size?: number;
   timestamp: string;
 }
 
@@ -59,7 +59,7 @@ export default function LargeOptionTrades() {
           </Select>
         ) : (
           <Tabs defaultValue="flow" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-7">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="flow">Flow Feed</TabsTrigger>
               <TabsTrigger value="scalps">Scalps</TabsTrigger>
               <TabsTrigger value="unusual">Unusual</TabsTrigger>
@@ -68,133 +68,131 @@ export default function LargeOptionTrades() {
               <TabsTrigger value="frc">FRC AI Sweeps</TabsTrigger>
             </TabsList>
 
-          <TabsContent value="flow">
-            <Card>
-              <CardHeader>
-                <CardTitle>Flow Feed</CardTitle>
-              </CardHeader>
-              <CardContent className="overflow-x-auto">
-                {isLoading ? (
-                  <div className="flex justify-center py-8">
-                    <Loader2 className="h-8 w-8 animate-spin" />
-                  </div>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Time</TableHead>
-                        <TableHead>Symbol</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Strike</TableHead>
-                        <TableHead>Expiry</TableHead>
-                        <TableHead>Size</TableHead>
-                        <TableHead>Volume</TableHead>
-                        <TableHead>Premium</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {flow?.map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell>
-                            {item.timestamp ? format(new Date(item.timestamp), "HH:mm:ss") : "-"}
-                          </TableCell>
-                          <TableCell>{item.ticker}</TableCell>
-                          <TableCell>
-                            <Badge variant={item.type === "call" ? "default" : "destructive"}>
-                              {item.type.toUpperCase()}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>${item.strike}</TableCell>
-                          <TableCell>
-                            {format(new Date(item.expiry), "MM/dd/yyyy")}
-                            <span className="text-muted-foreground text-xs ml-2">
-                              ({Math.ceil((new Date(item.expiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}d)
-                            </span>
-                          </TableCell>
-                          <TableCell>{item.size?.toLocaleString() || '-'}</TableCell>
-                          <TableCell>{item.volume.toLocaleString()}</TableCell>
-                          <TableCell>
-                            ${(item.premium / 100).toLocaleString()}
-                            <span className="text-xs text-muted-foreground ml-1">
-                              (${((item.premium * item.volume) / 100).toLocaleString()} total)
-                            </span>
-                          </TableCell>
+            <TabsContent value="flow">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Flow Feed</CardTitle>
+                </CardHeader>
+                <CardContent className="overflow-x-auto">
+                  {isLoading ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="h-8 w-8 animate-spin" />
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Time</TableHead>
+                          <TableHead>Symbol</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Strike</TableHead>
+                          <TableHead>Expiry</TableHead>
+                          <TableHead>Size</TableHead>
+                          <TableHead>Volume</TableHead>
+                          <TableHead>Premium</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="scalps">
-            <Card>
-              <CardHeader>
-                <CardTitle>Scalps</CardTitle>
-              </CardHeader>
-              <CardContent className="overflow-x-auto">
-                {isLoading ? (
-                  <div className="flex justify-center py-8">
-                    <Loader2 className="h-8 w-8 animate-spin" />
-                  </div>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Time</TableHead>
-                        <TableHead>Symbol</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Strike</TableHead>
-                        <TableHead>Expiry</TableHead>
-                        <TableHead>Size</TableHead>
-                        <TableHead>Volume</TableHead>
-                        <TableHead>Premium</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {flow?.filter(item => {
-                        const expiryDate = new Date(item.expiry);
-                        const today = new Date();
-                        const diffTime = Math.abs(expiryDate.getTime() - today.getTime());
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                        return diffDays <= 7;
-                      }).map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell>
-                            {item.timestamp ? format(new Date(item.timestamp), "HH:mm:ss") : "-"}
-                          </TableCell>
-                          <TableCell>{item.ticker}</TableCell>
-                          <TableCell>
-                            <Badge variant={item.type === "call" ? "default" : "destructive"}>
-                              {item.type.toUpperCase()}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>${item.strike}</TableCell>
-                          <TableCell>
-                            {format(new Date(item.expiry), "MM/dd/yyyy")}
-                            <span className="text-muted-foreground text-xs ml-2">
-                              ({Math.ceil((new Date(item.expiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}d)
-                            </span>
-                          </TableCell>
-                          <TableCell>{item.size?.toLocaleString() || '-'}</TableCell>
-                          <TableCell>{item.volume.toLocaleString()}</TableCell>
-                          <TableCell>
-                            ${(item.premium / 100).toLocaleString()}
-                            <span className="text-xs text-muted-foreground ml-1">
-                              (${((item.premium * item.volume) / 100).toLocaleString()} total)
-                            </span>
-                          </TableCell>
+                      </TableHeader>
+                      <TableBody>
+                        {flow?.map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell>
+                              {item.timestamp ? format(new Date(item.timestamp), "HH:mm:ss") : "-"}
+                            </TableCell>
+                            <TableCell>{item.ticker}</TableCell>
+                            <TableCell>
+                              <Badge variant={item.type === "call" ? "default" : "destructive"}>
+                                {item.type.toUpperCase()}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>${item.strike}</TableCell>
+                            <TableCell>
+                              {format(new Date(item.expiry), "MM/dd/yyyy")}
+                              <span className="text-muted-foreground text-xs ml-2">
+                                ({Math.ceil((new Date(item.expiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}d)
+                              </span>
+                            </TableCell>
+                            <TableCell>{item.size?.toLocaleString() || '-'}</TableCell>
+                            <TableCell>{item.volume.toLocaleString()}</TableCell>
+                            <TableCell>
+                              ${(item.premium / 100).toLocaleString()}
+                              <span className="text-xs text-muted-foreground ml-1">
+                                (${((item.premium * item.volume) / 100).toLocaleString()} total)
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="scalps">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Scalps</CardTitle>
+                </CardHeader>
+                <CardContent className="overflow-x-auto">
+                  {isLoading ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="h-8 w-8 animate-spin" />
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Time</TableHead>
+                          <TableHead>Symbol</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Strike</TableHead>
+                          <TableHead>Expiry</TableHead>
+                          <TableHead>Size</TableHead>
+                          <TableHead>Volume</TableHead>
+                          <TableHead>Premium</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="unusual">
+                      </TableHeader>
+                      <TableBody>
+                        {flow?.filter(item => {
+                          const expiryDate = new Date(item.expiry);
+                          const today = new Date();
+                          const diffTime = Math.abs(expiryDate.getTime() - today.getTime());
+                          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                          return diffDays <= 7;
+                        }).map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell>
+                              {item.timestamp ? format(new Date(item.timestamp), "HH:mm:ss") : "-"}
+                            </TableCell>
+                            <TableCell>{item.ticker}</TableCell>
+                            <TableCell>
+                              <Badge variant={item.type === "call" ? "default" : "destructive"}>
+                                {item.type.toUpperCase()}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>${item.strike}</TableCell>
+                            <TableCell>
+                              {format(new Date(item.expiry), "MM/dd/yyyy")}
+                              <span className="text-muted-foreground text-xs ml-2">
+                                ({Math.ceil((new Date(item.expiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}d)
+                              </span>
+                            </TableCell>
+                            <TableCell>{item.size?.toLocaleString() || '-'}</TableCell>
+                            <TableCell>{item.volume.toLocaleString()}</TableCell>
+                            <TableCell>
+                              ${(item.premium / 100).toLocaleString()}
+                              <span className="text-xs text-muted-foreground ml-1">
+                                (${((item.premium * item.volume) / 100).toLocaleString()} total)
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="unusual">
               <Card>
                 <CardHeader>
                   <CardTitle>Unusual Activity</CardTitle>
@@ -220,8 +218,8 @@ export default function LargeOptionTrades() {
                       </TableHeader>
                       <TableBody>
                         {flow?.filter(item => {
-                          const isPremiumUnusual = item.premium > 100000; // Premium > $100k
-                          const isVolumeUnusual = item.volume > 1000; // Volume > 1000 contracts
+                          const isPremiumUnusual = item.premium > 100000;
+                          const isVolumeUnusual = item.volume > 1000;
                           return isPremiumUnusual || isVolumeUnusual;
                         }).map((item) => (
                           <TableRow key={item.id}>
@@ -257,137 +255,138 @@ export default function LargeOptionTrades() {
                 </CardContent>
               </Card>
             </TabsContent>
-          <TabsContent value="golden">
-            <Card>
-              <CardHeader>
-                <CardTitle>Golden Sweeps</CardTitle>
-              </CardHeader>
-              <CardContent className="overflow-x-auto">
-                {isLoading ? (
-                  <div className="flex justify-center py-8">
-                    <Loader2 className="h-8 w-8 animate-spin" />
-                  </div>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Time</TableHead>
-                        <TableHead>Symbol</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Strike</TableHead>
-                        <TableHead>Expiry</TableHead>
-                        <TableHead>Size</TableHead>
-                        <TableHead>Volume</TableHead>
-                        <TableHead>Premium</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {flow?.filter(item => item.premium >= 250000).map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell>
-                            {item.timestamp ? format(new Date(item.timestamp), "HH:mm:ss") : "-"}
-                          </TableCell>
-                          <TableCell>{item.ticker}</TableCell>
-                          <TableCell>
-                            <Badge variant={item.type === "call" ? "default" : "destructive"}>
-                              {item.type.toUpperCase()}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>${item.strike}</TableCell>
-                          <TableCell>
-                            {format(new Date(item.expiry), "MM/dd/yyyy")}
-                            <span className="text-muted-foreground text-xs ml-2">
-                              ({Math.ceil((new Date(item.expiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}d)
-                            </span>
-                          </TableCell>
-                          <TableCell>{item.size?.toLocaleString() || '-'}</TableCell>
-                          <TableCell>{item.volume.toLocaleString()}</TableCell>
-                          <TableCell>
-                            ${(item.premium / 100).toLocaleString()}
-                            <span className="text-xs text-muted-foreground ml-1">
-                              (${((item.premium * item.volume) / 100).toLocaleString()} total)
-                            </span>
-                          </TableCell>
+            <TabsContent value="golden">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Golden Sweeps</CardTitle>
+                </CardHeader>
+                <CardContent className="overflow-x-auto">
+                  {isLoading ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="h-8 w-8 animate-spin" />
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Time</TableHead>
+                          <TableHead>Symbol</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Strike</TableHead>
+                          <TableHead>Expiry</TableHead>
+                          <TableHead>Size</TableHead>
+                          <TableHead>Volume</TableHead>
+                          <TableHead>Premium</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="million">
-            <Card>
-              <CardHeader>
-                <CardTitle>Premium $1M+</CardTitle>
-              </CardHeader>
-              <CardContent className="overflow-x-auto">
-                {isLoading ? (
-                  <div className="flex justify-center py-8">
-                    <Loader2 className="h-8 w-8 animate-spin" />
-                  </div>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Time</TableHead>
-                        <TableHead>Symbol</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Strike</TableHead>
-                        <TableHead>Expiry</TableHead>
-                        <TableHead>Size</TableHead>
-                        <TableHead>Volume</TableHead>
-                        <TableHead>Premium</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {flow?.filter(item => item.premium >= 1000000).map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell>
-                            {item.timestamp ? format(new Date(item.timestamp), "HH:mm:ss") : "-"}
-                          </TableCell>
-                          <TableCell>{item.ticker}</TableCell>
-                          <TableCell>
-                            <Badge variant={item.type === "call" ? "default" : "destructive"}>
-                              {item.type.toUpperCase()}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>${item.strike}</TableCell>
-                          <TableCell>
-                            {format(new Date(item.expiry), "MM/dd/yyyy")}
-                            <span className="text-muted-foreground text-xs ml-2">
-                              ({Math.ceil((new Date(item.expiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}d)
-                            </span>
-                          </TableCell>
-                          <TableCell>{item.size?.toLocaleString() || '-'}</TableCell>
-                          <TableCell>{item.volume.toLocaleString()}</TableCell>
-                          <TableCell>
-                            ${(item.premium / 100).toLocaleString()}
-                            <span className="text-xs text-muted-foreground ml-1">
-                              (${((item.premium * item.volume) / 100).toLocaleString()} total)
-                            </span>
-                          </TableCell>
+                      </TableHeader>
+                      <TableBody>
+                        {flow?.filter(item => item.premium >= 250000).map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell>
+                              {item.timestamp ? format(new Date(item.timestamp), "HH:mm:ss") : "-"}
+                            </TableCell>
+                            <TableCell>{item.ticker}</TableCell>
+                            <TableCell>
+                              <Badge variant={item.type === "call" ? "default" : "destructive"}>
+                                {item.type.toUpperCase()}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>${item.strike}</TableCell>
+                            <TableCell>
+                              {format(new Date(item.expiry), "MM/dd/yyyy")}
+                              <span className="text-muted-foreground text-xs ml-2">
+                                ({Math.ceil((new Date(item.expiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}d)
+                              </span>
+                            </TableCell>
+                            <TableCell>{item.size?.toLocaleString() || '-'}</TableCell>
+                            <TableCell>{item.volume.toLocaleString()}</TableCell>
+                            <TableCell>
+                              ${(item.premium / 100).toLocaleString()}
+                              <span className="text-xs text-muted-foreground ml-1">
+                                (${((item.premium * item.volume) / 100).toLocaleString()} total)
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="million">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Premium $1M+</CardTitle>
+                </CardHeader>
+                <CardContent className="overflow-x-auto">
+                  {isLoading ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="h-8 w-8 animate-spin" />
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Time</TableHead>
+                          <TableHead>Symbol</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Strike</TableHead>
+                          <TableHead>Expiry</TableHead>
+                          <TableHead>Size</TableHead>
+                          <TableHead>Volume</TableHead>
+                          <TableHead>Premium</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="frc">
-            <Card>
-              <CardHeader>
-                <CardTitle>FRC AI Sweeps</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-center py-8 text-muted-foreground">
-                  Coming soon...
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                      </TableHeader>
+                      <TableBody>
+                        {flow?.filter(item => item.premium >= 1000000).map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell>
+                              {item.timestamp ? format(new Date(item.timestamp), "HH:mm:ss") : "-"}
+                            </TableCell>
+                            <TableCell>{item.ticker}</TableCell>
+                            <TableCell>
+                              <Badge variant={item.type === "call" ? "default" : "destructive"}>
+                                {item.type.toUpperCase()}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>${item.strike}</TableCell>
+                            <TableCell>
+                              {format(new Date(item.expiry), "MM/dd/yyyy")}
+                              <span className="text-muted-foreground text-xs ml-2">
+                                ({Math.ceil((new Date(item.expiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}d)
+                              </span>
+                            </TableCell>
+                            <TableCell>{item.size?.toLocaleString() || '-'}</TableCell>
+                            <TableCell>{item.volume.toLocaleString()}</TableCell>
+                            <TableCell>
+                              ${(item.premium / 100).toLocaleString()}
+                              <span className="text-xs text-muted-foreground ml-1">
+                                (${((item.premium * item.volume) / 100).toLocaleString()} total)
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="frc">
+              <Card>
+                <CardHeader>
+                  <CardTitle>FRC AI Sweeps</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-center py-8 text-muted-foreground">
+                    Coming soon...
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        )}
       </div>
     </div>
   );
