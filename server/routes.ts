@@ -266,7 +266,7 @@ export function registerRoutes(app: Express): Server {
       const [account] = await db
         .update(paperTradingAccounts)
         .set({
-          balance: req.body.balance,
+          balance: 10000, // Reset to initial 10000 USD
           totalPnl: 0,
           dailyPnl: 0,
           lastResetAt: new Date(),
