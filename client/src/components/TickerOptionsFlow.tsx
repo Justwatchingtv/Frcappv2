@@ -54,7 +54,7 @@ export function TickerOptionsFlow({ symbol }: { symbol: string }) {
           {flow?.map((item) => (
             <TableRow key={item.id}>
               <TableCell>
-                {format(new Date(item.timestamp), 'HH:mm:ss')}
+                {format(new Date(parseInt(item.timestamp)), 'HH:mm:ss')}
               </TableCell>
               <TableCell>
                 <Badge variant={item.type === 'call' ? 'default' : 'destructive'}>
