@@ -11,8 +11,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 export function OptionsFlow() {
+  const { toast } = useToast();
   const { data: flow, isLoading } = useQuery({
     queryKey: ["/api/options-flow"],
   });
@@ -46,6 +49,7 @@ export function OptionsFlow() {
               <TableHead>Expiry</TableHead>
               <TableHead>Volume</TableHead>
               <TableHead>Premium</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -69,6 +73,46 @@ export function OptionsFlow() {
                 <TableCell>{format(new Date(item.expiry), 'MM/dd/yyyy')}</TableCell>
                 <TableCell>{item.volume.toLocaleString()}</TableCell>
                 <TableCell>${(item.premium / 100).toLocaleString()}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      fetch('/api/paper-trading/trade', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                          symbol: item.ticker,
+                          type: item.type,
+                          strike: item.strike,
+                          expiry: item.expiry,
+                          amount: item.premium
+                        })
+                      })
+                      .then(response => {
+                        if (!response.ok) throw new Error('Trade failed');
+                        return response.json();
+                      })
+                      .then(() => {
+                        toast({
+                          title: "Trade Executed",
+                          description: `Opened ${item.type.toUpperCase()} position in ${item.ticker}`,
+                        });
+                      })
+                      .catch(error => {
+                        toast({
+                          title: "Trade Failed",
+                          description: error.message,
+                          variant: "destructive",
+                        });
+                      });
+                    }}
+                  >
+                    Trade
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
