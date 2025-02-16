@@ -47,6 +47,7 @@ export function OptionsFlow() {
               <TableHead>Type</TableHead>
               <TableHead>Strike</TableHead>
               <TableHead>Expiry</TableHead>
+              <TableHead>Size</TableHead>
               <TableHead>Volume</TableHead>
               <TableHead>Premium</TableHead>
               <TableHead>Actions</TableHead>
@@ -76,6 +77,7 @@ export function OptionsFlow() {
                     ({Math.ceil((new Date(item.expiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}d)
                   </span>
                 </TableCell>
+                <TableCell>{item.size?.toLocaleString() || '-'}</TableCell>
                 <TableCell>{item.volume.toLocaleString()}</TableCell>
                 <TableCell>
                   ${(item.premium / 100).toLocaleString()}
