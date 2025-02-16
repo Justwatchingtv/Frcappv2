@@ -1,4 +1,3 @@
-
 import { WebSocket, WebSocketServer } from 'ws';
 import type { Server } from 'http';
 import { db } from '@db';
@@ -9,7 +8,7 @@ export function setupWebSocket(server: Server) {
     server,
     path: '/ws',
     clientTracking: true,
-    perMessageDeflate: false
+    perMessageDeflate: false 
   });
 
   wss.on('connection', (ws: WebSocket) => {
@@ -18,7 +17,7 @@ export function setupWebSocket(server: Server) {
     ws.on('message', async (data: string) => {
       try {
         const message = JSON.parse(data);
-        
+
         // Save message to database
         const [post] = await db
           .insert(posts)
