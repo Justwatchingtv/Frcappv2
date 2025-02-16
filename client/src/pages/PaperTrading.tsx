@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,9 +18,6 @@ import { TradeHistory } from "@/components/TradeHistory";
 import { StockChart } from "@/components/StockChart";
 import { Toggle } from "@/components/ui/toggle";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@radix-ui/react-dialog' // Or your UI library's Dialog components
-import { Label } from '@radix-ui/react-label' // Or your UI library's Label component
-
 
 interface TradeForm {
   symbol: string;
@@ -35,7 +33,6 @@ export default function PaperTrading() {
   const { toast } = useToast();
   const [selectedSymbol, setSelectedSymbol] = useState<string>("");
   const [orderType, setOrderType] = useState<'MARKET' | 'LIMIT'>('MARKET');
-  const [newBalance, setNewBalance] = useState<number>(100000); // State for new balance
 
   const { data: account, isLoading: isLoadingAccount } = useQuery({
     queryKey: ["/api/paper-trading/account"],
@@ -81,31 +78,6 @@ export default function PaperTrading() {
     },
   });
 
-  const resetAccountMutation = useMutation({ // Mutation for resetting the account
-    mutationFn: async () => {
-      const response = await fetch('/api/paper-trading/reset', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ balance: newBalance })
-      });
-      if (!response.ok) {
-        throw new Error(await response.text());
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({ title: 'Account Reset', description: 'Your account balance has been reset.' });
-    },
-    onError: (error) => {
-      toast({ title: 'Account Reset Failed', description: error.message, variant: 'destructive' });
-    }
-  })
-
-  const handleResetAccount = () => {
-    resetAccountMutation.mutate();
-  };
-
-
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="container mx-auto max-w-7xl">
@@ -133,39 +105,6 @@ export default function PaperTrading() {
                   <div>
                     <div className="text-sm text-muted-foreground">Net Account Value</div>
                     <div className="text-2xl font-bold">${account?.balance.toLocaleString()}</div>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="mt-2">
-                          Reset Account
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Reset Paper Trading Account</DialogTitle>
-                          <DialogDescription>
-                            Enter the amount you want to set as your new account balance.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                          <div className="grid gap-2">
-                            <Label htmlFor="balance">New Balance</Label>
-                            <Input
-                              id="balance"
-                              type="number"
-                              min="1000"
-                              step="1000"
-                              defaultValue="100000"
-                              onChange={(e) => setNewBalance(Number(e.target.value))}
-                            />
-                          </div>
-                        </div>
-                        <DialogFooter>
-                          <Button onClick={handleResetAccount} disabled={resetAccountMutation.isPending}>
-                            {resetAccountMutation.isPending ? "Resetting..." : "Reset Account"}
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
                   </div>
                   <div>
                     <div className="text-sm text-muted-foreground">Overall P&L</div>
@@ -199,131 +138,131 @@ export default function PaperTrading() {
                 {orderType === 'stocks' ? (
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit((data) => tradeMutation.mutate(data))} className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="symbol"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Symbol</FormLabel>
-                              <FormControl>
-                                <Input placeholder="AAPL" {...field} />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="side"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Side</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select side" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="buy">Buy</SelectItem>
-                                  <SelectItem value="sell">Sell</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="orderType"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Order Type</FormLabel>
-                              <Select onValueChange={(value) => {
-                                field.onChange(value);
-                                setOrderType(value as 'MARKET' | 'LIMIT');
-                              }} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select order type" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="MARKET">Market</SelectItem>
-                                  <SelectItem value="LIMIT">Limit</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="quantity"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Quantity</FormLabel>
-                              <FormControl>
-                                <Input type="number" {...field} />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        {orderType === 'LIMIT' && (
-                          <FormField
-                            control={form.control}
-                            name="limitPrice"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Limit Price</FormLabel>
-                                <FormControl>
-                                  <Input type="number" step="0.01" {...field} />
-                                </FormControl>
-                              </FormItem>
-                            )}
-                          />
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="symbol"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Symbol</FormLabel>
+                            <FormControl>
+                              <Input placeholder="AAPL" {...field} />
+                            </FormControl>
+                          </FormItem>
                         )}
-                        <FormField
-                          control={form.control}
-                          name="timeInForce"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Time in Force</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select TIF" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="DAY">Day</SelectItem>
-                                  <SelectItem value="GTC">GTC</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="extendedHours"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Extended Hours</FormLabel>
+                      />
+                      <FormField
+                        control={form.control}
+                        name="side"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Side</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <Toggle
-                                  pressed={field.value}
-                                  onPressedChange={field.onChange}
-                                  className="w-full"
-                                >
-                                  {field.value ? 'Yes' : 'No'}
-                                </Toggle>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select side" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="buy">Buy</SelectItem>
+                                <SelectItem value="sell">Sell</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="orderType"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Order Type</FormLabel>
+                            <Select onValueChange={(value) => {
+                              field.onChange(value);
+                              setOrderType(value as 'MARKET' | 'LIMIT');
+                            }} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select order type" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="MARKET">Market</SelectItem>
+                                <SelectItem value="LIMIT">Limit</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="quantity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Quantity</FormLabel>
+                            <FormControl>
+                              <Input type="number" {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      {orderType === 'LIMIT' && (
+                        <FormField
+                          control={form.control}
+                          name="limitPrice"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Limit Price</FormLabel>
+                              <FormControl>
+                                <Input type="number" step="0.01" {...field} />
                               </FormControl>
                             </FormItem>
                           )}
                         />
-                      </div>
-                      <Button type="submit" className="w-full">
-                        {tradeMutation.isPending ? "Placing Order..." : "Place Order"}
-                      </Button>
-                    </form>
+                      )}
+                      <FormField
+                        control={form.control}
+                        name="timeInForce"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Time in Force</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select TIF" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="DAY">Day</SelectItem>
+                                <SelectItem value="GTC">GTC</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="extendedHours"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Extended Hours</FormLabel>
+                            <FormControl>
+                              <Toggle 
+                                pressed={field.value}
+                                onPressedChange={field.onChange}
+                                className="w-full"
+                              >
+                                {field.value ? 'Yes' : 'No'}
+                              </Toggle>
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <Button type="submit" className="w-full">
+                      {tradeMutation.isPending ? "Placing Order..." : "Place Order"}
+                    </Button>
+                  </form>
                   </Form>
                 ) : (
                   <OptionsChainSimulator />

@@ -257,36 +257,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Get paper trading account details
-  app.post("/api/paper-trading/reset", async (req, res) => {
-  if (!req.user) {
-    return res.status(401).send("Not authenticated");
-  }
-
-  try {
-    const { balance } = req.body;
-    
-    if (!balance || balance < 1000) {
-      return res.status(400).send("Invalid balance amount");
-    }
-
-    const [account] = await db
-      .update(paperTradingAccounts)
-      .set({
-        balance: balance,
-        totalPnl: 0,
-        dailyPnl: 0,
-        lastResetAt: new Date(),
-      })
-      .where(eq(paperTradingAccounts.userId, req.user.id))
-      .returning();
-
-    res.json(account);
-  } catch (error) {
-    res.status(500).send("Error resetting account");
-  }
-});
-
-app.get("/api/paper-trading/account", async (req, res) => {
+  app.get("/api/paper-trading/account", async (req, res) => {
     if (!req.user) {
       return res.status(401).send("Not authenticated");
     }
