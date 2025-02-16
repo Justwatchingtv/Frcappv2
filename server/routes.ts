@@ -287,14 +287,21 @@ export function registerRoutes(app: Express): Server {
     }
 
     try {
-      const [account] = await db
+      let [account] = await db
         .select()
         .from(paperTradingAccounts)
         .where(eq(paperTradingAccounts.userId, req.user.id))
         .limit(1);
 
       if (!account) {
-        return res.status(404).send("Account not found");
+        // Create account if it doesn't exist
+        [account] = await db
+          .insert(paperTradingAccounts)
+          .values({
+            userId: req.user.id,
+            balance: 10000, // Initial balance
+          })
+          .returning();
       }
 
       const [updatedAccount] = await db
@@ -307,7 +314,8 @@ export function registerRoutes(app: Express): Server {
 
       res.json(updatedAccount);
     } catch (error) {
-      res.status(500).send("Error adding buying power");
+      console.error("Error adding buying power:", error);
+      res.status(500).send("Error adding buying power: " + error.message);
     }
   });
 
