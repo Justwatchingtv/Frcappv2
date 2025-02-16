@@ -121,6 +121,20 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Get ticker-specific options flow data
+  app.get("/api/options-flow/:symbol", async (req, res) => {
+    try {
+      const flow = await db.query.optionsFlow.findMany({
+        where: eq(optionsFlow.ticker, req.params.symbol.toUpperCase()),
+        orderBy: desc(optionsFlow.createdAt),
+        limit: 100,
+      });
+      res.json(flow);
+    } catch (error) {
+      res.status(500).send("Error fetching options flow");
+    }
+  });
+
   // Get leaderboard data
   app.get("/api/leaderboard", async (req, res) => {
     try {

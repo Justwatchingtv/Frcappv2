@@ -65,12 +65,13 @@ export default function TickerView() {
         </div>
 
         <Tabs defaultValue="bio" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="bio">Biography</TabsTrigger>
             <TabsTrigger value="chart">Chart</TabsTrigger>
             <TabsTrigger value="sentiment">Sentiment</TabsTrigger>
             <TabsTrigger value="earnings">Earnings</TabsTrigger>
             <TabsTrigger value="fundamentals">Fundamentals</TabsTrigger>
+            <TabsTrigger value="flow">Flow</TabsTrigger>
           </TabsList>
 
           <TabsContent value="bio">
@@ -231,6 +232,17 @@ export default function TickerView() {
                     <p className="text-2xl">{fundamentals ? (fundamentals.avgVolume / 1e6).toFixed(2) : '-'}M</p>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="flow">
+            <Card>
+              <CardHeader>
+                <CardTitle>Options Flow</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TickerOptionsFlow symbol={symbol} />
               </CardContent>
             </Card>
           </TabsContent>
