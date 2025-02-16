@@ -388,6 +388,7 @@ export default function LargeOptionTrades() {
             </Card>
           </TabsContent>
         </Tabs>
+        </div>
       </div>
     </div>
   );
