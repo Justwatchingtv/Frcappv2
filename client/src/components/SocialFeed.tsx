@@ -74,8 +74,82 @@ export function SocialFeed() {
     };
   }, []);
 
+  const mockPosts = [
+    {
+      id: 1,
+      user: { username: "trader_pro", image: null },
+      content: "$NVDA breaking out to new highs! Strong momentum in AI sector 🚀",
+      createdAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
+      reactions: { "🚀": 15, "💰": 8 }
+    },
+    {
+      id: 2,
+      user: { username: "market_guru", image: null },
+      content: "Watching $AAPL for potential breakout above resistance. Technical setup looks promising 📈",
+      createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+      reactions: { "👍": 12, "🤔": 3 }
+    },
+    {
+      id: 3,
+      user: { username: "options_master", image: null },
+      content: "$TSLA unusual options activity detected. Large call buying at $250 strike for next month",
+      createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+      reactions: { "👀": 20, "💰": 15 }
+    },
+    {
+      id: 4,
+      user: { username: "tech_trader", image: null },
+      content: "Loading up on $AMD. Semiconductor sector looking strong with AI tailwinds 💪",
+      createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+      reactions: { "🚀": 10, "💪": 7 }
+    },
+    {
+      id: 5,
+      user: { username: "value_investor", image: null },
+      content: "$META earnings beat! Ad revenue growth accelerating. Long-term hold 📈",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
+      reactions: { "🎯": 18, "💰": 12 }
+    },
+    {
+      id: 6,
+      user: { username: "chart_master", image: null },
+      content: "$SPY forming a bull flag pattern. Looking for continuation above 500 🎯",
+      createdAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
+      reactions: { "📈": 25, "👍": 15 }
+    },
+    {
+      id: 7,
+      user: { username: "crypto_trader", image: null },
+      content: "$COIN benefiting from Bitcoin ETF approval. Strong institutional flows 💪",
+      createdAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
+      reactions: { "🚀": 30, "💰": 20 }
+    },
+    {
+      id: 8,
+      user: { username: "swing_trader", image: null },
+      content: "Opened position in $MSFT ahead of AI announcements. Technical setup looks perfect 🎯",
+      createdAt: new Date(Date.now() - 1000 * 60 * 240).toISOString(),
+      reactions: { "👍": 22, "🚀": 18 }
+    },
+    {
+      id: 9,
+      user: { username: "day_trader", image: null },
+      content: "$PLTR showing strong momentum. AI narrative driving growth 📈",
+      createdAt: new Date(Date.now() - 1000 * 60 * 300).toISOString(),
+      reactions: { "💪": 16, "🚀": 12 }
+    },
+    {
+      id: 10,
+      user: { username: "options_flow", image: null },
+      content: "Unusual activity in $AMZN calls. Big players betting on earnings beat 👀",
+      createdAt: new Date(Date.now() - 1000 * 60 * 360).toISOString(),
+      reactions: { "👀": 28, "💰": 22 }
+    }
+  ];
+
   const { data: posts, isLoading } = useQuery({
     queryKey: ["/api/posts"],
+    initialData: mockPosts
   });
 
   const form = useForm<PostForm>({
