@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -122,7 +121,7 @@ export default function PaperTrading() {
                 <div className="mt-4 flex items-center gap-2">
                   <Input
                     type="number"
-                    placeholder="Enter new balance"
+                    placeholder="Enter amount"
                     onChange={(e) => setNewBalance(parseFloat(e.target.value))}
                     className="w-40"
                   />
@@ -150,6 +149,31 @@ export default function PaperTrading() {
                     }}
                   >
                     Reset Balance
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={async () => {
+                      try {
+                        await fetch("/api/paper-trading/add-balance", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ amount: newBalance }),
+                        });
+                        toast({
+                          title: "Balance Updated",
+                          description: "Additional buying power has been added.",
+                        });
+                        await queryClient.invalidateQueries({ queryKey: ["/api/paper-trading/account"] });
+                      } catch (error) {
+                        toast({
+                          title: "Error",
+                          description: "Failed to add buying power.",
+                          variant: "destructive",
+                        });
+                      }
+                    }}
+                  >
+                    Add Buying Power
                   </Button>
                 </div>
               </CardContent>

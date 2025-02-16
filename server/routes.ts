@@ -280,6 +280,37 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Add buying power to paper trading account
+  app.post("/api/paper-trading/add-balance", async (req, res) => {
+    if (!req.user) {
+      return res.status(401).send("Not authenticated");
+    }
+
+    try {
+      const [account] = await db
+        .select()
+        .from(paperTradingAccounts)
+        .where(eq(paperTradingAccounts.userId, req.user.id))
+        .limit(1);
+
+      if (!account) {
+        return res.status(404).send("Account not found");
+      }
+
+      const [updatedAccount] = await db
+        .update(paperTradingAccounts)
+        .set({
+          balance: account.balance + req.body.amount,
+        })
+        .where(eq(paperTradingAccounts.userId, req.user.id))
+        .returning();
+
+      res.json(updatedAccount);
+    } catch (error) {
+      res.status(500).send("Error adding buying power");
+    }
+  });
+
   // Get paper trading account details
   app.get("/api/paper-trading/account", async (req, res) => {
     if (!req.user) {
