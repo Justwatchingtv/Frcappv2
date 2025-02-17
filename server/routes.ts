@@ -12,33 +12,37 @@ async function fetchLargeOptionTrades() {
     throw new Error("POLYGON_API_KEY not found");
   }
 
-  // Get today's date in YYYY-MM-DD format
   const today = new Date().toISOString().split('T')[0];
-
-  const response = await fetch(
-    `https://api.polygon.io/v3/trades/options?timestamp.gte=${today}&premium_price.gt=100000&limit=50&apiKey=${API_KEY}`,
-    {
-      headers: {
-        'Accept': 'application/json'
+  
+  try {
+    const response = await fetch(
+      `https://api.polygon.io/v2/snapshot/options/AAPL,MSFT,AMZN,GOOGL,META,NVDA,TSLA,AMD,SPY,QQQ?apiKey=${API_KEY}`,
+      {
+        headers: {
+          'Accept': 'application/json'
+        }
       }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Polygon API error: ${response.statusText}`);
     }
-  );
 
-  if (!response.ok) {
-    throw new Error(`Polygon API error: ${response.statusText}`);
+    const data = await response.json();
+    return data.results.map((result: any) => ({
+      id: Math.random().toString(36).substr(2, 9),
+      ticker: result.underlying_asset.symbol,
+      strike: result.strike_price,
+      expiry: result.expiration_date,
+      premium: result.last_trade?.price || 0,
+      type: result.details.contract_type.toLowerCase(),
+      volume: result.day.volume,
+      timestamp: new Date().toISOString(),
+    }));
+  } catch (error) {
+    console.error('Error fetching options data:', error);
+    return [];
   }
-
-  const data = await response.json();
-  return data.results.map((trade: any) => ({
-    id: trade.id,
-    ticker: trade.underlying_symbol,
-    strike_price: trade.strike_price,
-    expiration_date: trade.expiration_date,
-    premium: trade.premium_price,
-    contract_type: trade.contract_type.toLowerCase(),
-    size: trade.size,
-    timestamp: trade.sip_timestamp,
-  }));
 }
 
 export function registerRoutes(app: Express): Server {
