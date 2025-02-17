@@ -1,7 +1,5 @@
+
 import { Switch, Route } from "wouter";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "./lib/queryClient";
-import { Toaster } from "@/components/ui/toaster";
 import { useUser } from "./hooks/use-user";
 import { Loader2 } from "lucide-react";
 import AuthPage from "./pages/AuthPage";
@@ -24,26 +22,18 @@ function App() {
   }
 
   if (!user) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <AuthPage />
-        <Toaster />
-      </QueryClientProvider>
-    );
+    return <AuthPage />;
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/large-options" component={LargeOptionTrades} />
-        <Route path="/paper-trading" component={PaperTrading} />
-        <Route path="/markets" component={Markets} />
-        <Route path="/ticker/:symbol" component={TickerView} />
-        <Route path="/profile/:username?" component={UserProfile} />
-      </Switch>
-      <Toaster />
-    </QueryClientProvider>
+    <Switch>
+      <Route path="/" component={Home} />
+      <Route path="/large-options" component={LargeOptionTrades} />
+      <Route path="/paper-trading" component={PaperTrading} />
+      <Route path="/markets" component={Markets} />
+      <Route path="/ticker/:symbol" component={TickerView} />
+      <Route path="/profile/:username?" component={UserProfile} />
+    </Switch>
   );
 }
 
