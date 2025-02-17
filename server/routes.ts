@@ -16,7 +16,7 @@ async function fetchLargeOptionTrades() {
   
   try {
     const response = await fetch(
-      `https://api.polygon.io/v2/snapshot/options/AAPL,MSFT,AMZN,GOOGL,META,NVDA,TSLA,AMD,SPY,QQQ?apiKey=${API_KEY}`,
+      `https://api.polygon.io/v3/trades/options?limit=50&order=desc&sort=timestamp&timestamp.gt=${today}&apiKey=${API_KEY}`,
       {
         headers: {
           'Accept': 'application/json'
@@ -31,13 +31,13 @@ async function fetchLargeOptionTrades() {
     const data = await response.json();
     return data.results.map((result: any) => ({
       id: Math.random().toString(36).substr(2, 9),
-      ticker: result.underlying_asset.symbol,
-      strike: result.strike_price,
+      ticker: result.symbol.split('_')[0],
+      strike: parseFloat(result.strike_price),
       expiry: result.expiration_date,
-      premium: result.last_trade?.price || 0,
-      type: result.details.contract_type.toLowerCase(),
-      volume: result.day.volume,
-      timestamp: new Date().toISOString(),
+      premium: result.price * 100,
+      type: result.option_type.toLowerCase(),
+      volume: result.size,
+      timestamp: result.timestamp,
     }));
   } catch (error) {
     console.error('Error fetching options data:', error);
