@@ -550,20 +550,25 @@ export function registerRoutes(app: Express): Server {
       });
 
       // Get top losers
-      const losersResponse = await axios.get('https://finviz.com/screener.ashx?v=111&s=ta_toplosers');
-      const $losers = cheerio.load(losersResponse.data);
+      const losersResponse = await fetch('https://finviz.com/screener.ashx?v=111&s=ta_toplosers');
+      const losersHtml = await losersResponse.text();
+      const losersDom = new JSDOM(losersHtml);
+      const losersDocument = losersDom.window.document;
 
-      $losers('.screener-body-table-nw').each((i, elem) => {
+      const loserElements = losersDocument.querySelectorAll('.screener-body-table-nw');
+      loserElements.forEach((elem, i) => {
         if (i < 10) {
-          const row = $(elem).closest('tr');
-          const symbol = $(elem).text().trim();
-          const change = parseFloat(row.find('td:nth-child(8)').text().replace('%', ''));
-          const price = parseFloat(row.find('td:nth-child(9)').text());
-          const volume = parseInt(row.find('td:nth-child(11)').text().replace(/,/g, ''));
+          const row = elem.closest('tr');
+          if (!row) return;
+
+          const symbol = elem.textContent?.trim() || '';
+          const change = parseFloat(row.querySelector('td:nth-child(8)')?.textContent?.replace('%', '') || '0');
+          const price = parseFloat(row.querySelector('td:nth-child(9)')?.textContent || '0');
+          const volume = parseInt(row.querySelector('td:nth-child(11)')?.textContent?.replace(/,/g, '') || '0');
 
           losers.push({
             symbol,
-            name: row.find('td:nth-child(3)').text().trim(),
+            name: row.querySelector('td:nth-child(3)')?.textContent?.trim() || '',
             change,
             volume,
             price,
