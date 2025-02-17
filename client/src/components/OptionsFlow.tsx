@@ -58,7 +58,7 @@ export function OptionsFlow() {
             {flow?.map((item: any) => (
               <TableRow key={item.id}>
                 <TableCell>
-                  {item.timestamp ? format(new Date(parseInt(item.timestamp)), 'HH:mm:ss') : '-'}
+                  {item.timestamp ? format(new Date(item.timestamp), 'HH:mm:ss') : '-'}
                 </TableCell>
                 <TableCell
                   className="font-medium cursor-pointer hover:text-primary hover:underline"
