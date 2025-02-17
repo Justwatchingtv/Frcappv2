@@ -1,3 +1,4 @@
+
 import dotenv from "dotenv";
 import path from "path";
 
@@ -10,10 +11,12 @@ console.log('Database URL:', process.env.DATABASE_URL);
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import * as cors from "cors";
+
+
 
 const app = express();
-app.use(cors({ origin: true, credentials: true }));
+
+
 
 
 app.use(express.json());
@@ -49,9 +52,10 @@ app.use((req, res, next) => {
   next();
 });
 
+import { setupWebSocket } from './websocket';
+
 (async () => {
   const server = registerRoutes(app);
-  const { setupWebSocket } = await import('./websocket');
   setupWebSocket(server);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -71,9 +75,9 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 3000
+  // ALWAYS serve the app on port 5000
   // this serves both the API and the client
-  const PORT = process.env.PORT || 3000;
+  const PORT = 5000;
   server.listen(PORT, "0.0.0.0", () => {
     log(`serving on port ${PORT}`);
   });
