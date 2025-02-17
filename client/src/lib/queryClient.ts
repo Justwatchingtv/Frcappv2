@@ -9,10 +9,12 @@ export const queryClient = new QueryClient({
         });
 
         if (!res.ok) {
+          if (res.status === 401) {
+            return null;
+          }
           if (res.status >= 500) {
             throw new Error(`${res.status}: ${res.statusText}`);
           }
-
           throw new Error(`${res.status}: ${await res.text()}`);
         }
 
