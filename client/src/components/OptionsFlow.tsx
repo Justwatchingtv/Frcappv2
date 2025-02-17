@@ -18,6 +18,7 @@ export function OptionsFlow() {
   const { toast } = useToast();
   const { data: flow, isLoading } = useQuery({
     queryKey: ["/api/options-flow"],
+    refetchInterval: 5000, // Refetch every 5 seconds
   });
 
   if (isLoading) {
