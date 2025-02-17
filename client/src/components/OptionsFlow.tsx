@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import {
   Table,
@@ -18,7 +19,7 @@ export function OptionsFlow() {
   const { toast } = useToast();
   const { data: flow, isLoading } = useQuery({
     queryKey: ["/api/options-flow"],
-    refetchInterval: 5000, // Refetch every 5 seconds
+    refetchInterval: 5000,
   });
 
   if (isLoading) {
@@ -59,7 +60,7 @@ export function OptionsFlow() {
               const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
               const itemTime = new Date(item.timestamp);
               return itemTime >= fiveMinutesAgo && (item.premium * item.volume) / 100 >= 25000;
-            }).map((item: any) => (
+            }).map((item) => (
               <TableRow key={item.id}>
                 <TableCell>
                   {item.timestamp ? format(new Date(item.timestamp), 'HH:mm:ss') : '-'}
