@@ -284,7 +284,7 @@ export function registerRoutes(app: Express): Server {
       const [account] = await db
         .update(paperTradingAccounts)
         .set({
-          balance: 10000, // Reset to initial 10000 USD
+          balance: 10000, // Reset to initial $10k
           totalPnl: 0,
           dailyPnl: 0,
           lastResetAt: new Date(),
@@ -356,7 +356,7 @@ export function registerRoutes(app: Express): Server {
           .insert(paperTradingAccounts)
           .values({
             userId: req.user.id,
-            balance: 10000, //Give initial balance
+            balance: 10000, // Initial $10k balance
           })
           .returning();
       }

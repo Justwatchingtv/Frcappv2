@@ -176,7 +176,7 @@ export const challengeTradesRelations = relations(challengeTrades, ({ one }) => 
 export const paperTradingAccounts = pgTable("paper_trading_accounts", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  balance: numeric("balance").notNull().default("100000"), // Default $100k
+  balance: numeric("balance").notNull().default("10000"), // Default $10k
   totalPnl: numeric("total_pnl").default("0"),
   dailyPnl: numeric("daily_pnl").default("0"),
   createdAt: timestamp("created_at").defaultNow(),
