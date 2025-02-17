@@ -55,7 +55,7 @@ export function OptionsFlow() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {flow?.map((item: any) => (
+            {flow?.filter(item => (item.premium * item.volume) / 100 >= 25000).map((item: any) => (
               <TableRow key={item.id}>
                 <TableCell>
                   {item.timestamp ? format(new Date(item.timestamp), 'HH:mm:ss') : '-'}
